@@ -1,4 +1,4 @@
-import categroy from "../models/categroy.js";
+import categroy from "../models/category.js";
 
 export default {
     // 
