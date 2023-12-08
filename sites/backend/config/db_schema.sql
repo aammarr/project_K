@@ -10,7 +10,7 @@ CREATE TABLE
         `email` VARCHAR(255) NULL,
         `password` VARCHAR(255) NOT NULL,
         `role_id` INT NULL,
-        `fist_name` VARCHAR(255) NULL,
+        `first_name` VARCHAR(255) NULL,
         `last_name` VARCHAR(255) NULL,
         `phone` VARCHAR(255) NULL,
         `avatar` VARCHAR(255) NULL,

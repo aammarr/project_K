@@ -4,22 +4,23 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
 export default {
-  
+  // 
   register: async (req, res) => {
     console.log("register")
     try {
-      const { type } = req.params;
+      // const { type } = req?.params =='user' ?2:'';
+
       const { email, password, ...profileData } = req.body;
-      
+
       const userRecord = await user.findByEmail(email);
       if (userRecord) {
         return res.status(401).send({ status: false, message: 'Email already exist' });
       }
       const saltRounds = 10;
       const hashedPassword = await bcrypt.hash(password, saltRounds);
-      const account_type = type || 'user';
-      
-      await user.create({email, password: hashedPassword, account_type, ...profileData });
+      // const account_type = type || 'user';
+      console.log('HERE',{email, password: hashedPassword, ...profileData });
+      await user.create({email, password: hashedPassword, ...profileData });
       
       return res.status(200).send({ status: true, message: 'User created successfully' });
     } catch (error) {
@@ -27,6 +28,7 @@ export default {
     }
   },
 
+  // 
   login: async (req, res) => {
     console.log("login");
     try {
@@ -43,10 +45,11 @@ export default {
         }
         delete userRecord.password;
         delete userRecord.otp;
-        const account_type = userRecord.account_type;
+        
+        const role = userRecord.role_id==1?'admin':'user';
         let tokenObj = { 
-            userId: userRecord.id ,
-            account_type: account_type
+            userId: userRecord.user_id ,
+            role: role
         };
         console.log(tokenObj)
         const token = jwt.sign(
@@ -59,9 +62,10 @@ export default {
     }
   },
 
+  // 
   getUser: async (req, res) => {
     try {
-      
+        
         const userId = req.user.userId;
         const userRecord = await user.findById(userId);
         if (!userRecord) {
@@ -78,19 +82,21 @@ export default {
     }
   },
 
+  // 
   updateUser : async (req, res) => {
     let { name, email, password, ...updateObj } = req.body;
     const userId = req.user.userId;
+    
     try {
       const userRecord = await user.findById(userId);
-
-    delete userRecord.password;
-    delete userRecord.otp;
-    let tokenObj = { 
-      userId: userRecord.id,
-      account_type: userRecord.account_type 
-    };
-    updateObj = Object.assign({user_id: userId}, updateObj);
+      delete userRecord.password;
+      delete userRecord.otp;
+      let tokenObj = { 
+        userId: userRecord.user_id,
+        role_id: userRecord.role_id 
+      };
+      updateObj = Object.assign({user_id: userId}, updateObj);
+      console.log(updateObj)
     
       const token = jwt.sign(
         tokenObj,

@@ -1,6 +1,7 @@
 import db from './dbConnection.js';
 
 export default {
+  // 
   create: async (profileObj) => {
     const fields = Object.keys(profileObj);
     const values = fields.map((field) => `'${profileObj[field]}'`).join(',');
@@ -10,6 +11,8 @@ export default {
     console.log(rows)
     return rows.insertId;
   },
+
+  // 
   findByEmail: async (email) => {
     const sql = `
       SELECT * FROM users
@@ -19,6 +22,8 @@ export default {
     const [rows] = await db.query(sql, params);
     return rows;
   },
+  
+  // 
   updateById: async (id, userData) => {
     let sql = 'UPDATE users SET';
     const fields = Object.keys(userData);
@@ -30,10 +35,11 @@ export default {
     return await db.query(sql);
   },
 
+  // 
   findById: async (id) => {
     const sql = `
       SELECT * FROM users
-      WHERE id = ?
+      WHERE user_id = ?
     `;
     const params = [id];
     const [rows] = await db.query(sql, params);
