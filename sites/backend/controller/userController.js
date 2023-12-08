@@ -19,7 +19,6 @@ export default {
       const saltRounds = 10;
       const hashedPassword = await bcrypt.hash(password, saltRounds);
       // const account_type = type || 'user';
-      console.log('HERE',{email, password: hashedPassword, ...profileData });
       await user.create({email, password: hashedPassword, ...profileData });
       
       return res.status(200).send({ status: true, message: 'User created successfully' });
@@ -108,5 +107,5 @@ export default {
     console.error(error);
     return res.status(500).send({ status: false, message: 'Error updating user: ', error });
   }
-},
+  },
 };
