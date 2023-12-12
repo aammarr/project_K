@@ -1,7 +1,8 @@
 import categroy from "../models/category.js";
 
+
 export default {
-    // 
+    //Add Category Function
     createCategory: async (req, res) => {
         console.log("create new category")
         try {
