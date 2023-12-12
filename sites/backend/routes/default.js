@@ -4,7 +4,7 @@ const router = Router.Router();
 router.get("/", (req, res) => {
     res.send({
         message: 'Welcome to Project K',
-        version: '2023.12.12'
+        version: '2023.12.13'
     });
 });
 
