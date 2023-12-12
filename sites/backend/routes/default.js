@@ -3,7 +3,7 @@ import Router from "express";
 const router = Router.Router();
 router.get("/", (req, res) => {
     res.send({
-        message: 'Welcome'
+        message: 'Welcome to Project K'
     });
 });
 
