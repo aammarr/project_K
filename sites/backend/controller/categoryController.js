@@ -6,14 +6,14 @@ export default {
     createCategory: async (req, res) => {
         console.log("create new category")
         try {
-            const { category_name } = req.body;
+            const { category_name,category_description,category_code } = req.body;
             const user_id = req?.user.userId;
 
             if(!category_name){
               return res.status(401).send({ status: false, message: 'Category name is required' });
             }
             
-            await categroy.createCategory({user_id, category_name});
+            await categroy.createCategory({user_id, category_name,category_description,category_code});
     
             return res.status(200).send({ status: true, message: 'Category created successfully' });
         } catch (error) {
