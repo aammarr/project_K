@@ -44,7 +44,9 @@ CREATE TABLE
     `project_k`.`categories` (
         `category_id` INT NOT NULL AUTO_INCREMENT,
         `user_id` INT,
+        `category_code` VARCHAR(255) NULL,
         `category_name` VARCHAR(255) NULL,
+        `category_description` VARCHAR(255) NULL,
         `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
         `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
         PRIMARY KEY (`category_id`)
@@ -56,6 +58,7 @@ CREATE TABLE
     `project_k`.`templates` (
         `template_id` INT NOT NULL AUTO_INCREMENT,
         `user_id` VARCHAR(255) NULL,
+        `template_code` VARCHAR(255) NULL,
         `template_name` VARCHAR(255) NULL,
         `template_description` VARCHAR(255) NULL,
         `template_type` VARCHAR(255) NULL,
