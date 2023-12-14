@@ -7,6 +7,8 @@ const Users = React.lazy(() => import('./routes/users'))
 const Categories = React.lazy(() => import('./routes/categories/categories'))
 const Templates = React.lazy(() => import('./routes/templates/templates'))
 const AddCategory = React.lazy(() => import('./routes/categories/addCategory'))
+const UpdateCategory = React.lazy(() => import('./routes/categories/updateCategory'))
+
 const addTemplate = React.lazy(() => import('./routes/templates/addTemplate'))
 
 // Base
@@ -62,6 +64,8 @@ const routes = [
   { path: '/categories', name: 'Categories', element: Categories },
   { path: '/templates', name: 'Templates', element: Templates },
   { path: '/categories/add', name: 'Add Category', element: AddCategory },
+  { path: '/categories/update/:id', name: 'Update Category', element: UpdateCategory },
+
   { path: '/templates/add', name: 'Add Template', element: addTemplate },
 
   { path: '/theme', name: 'Theme', element: Colors, exact: true },
