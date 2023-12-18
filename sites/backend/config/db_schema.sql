@@ -58,6 +58,7 @@ CREATE TABLE
     `project_k`.`templates` (
         `template_id` INT NOT NULL AUTO_INCREMENT,
         `user_id` VARCHAR(255) NULL,
+        `category_id` VARCHAR(255) NULL,
         `template_code` VARCHAR(255) NULL,
         `template_name` VARCHAR(255) NULL,
         `template_description` VARCHAR(255) NULL,

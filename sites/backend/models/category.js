@@ -2,8 +2,8 @@ import db from './dbConnection.js';
 
 export default {
     // 
-    getAllCategories: async () => {
-        const sql = `SELECT * FROM categories`;
+    getAllCategories: async (searchCriteria,options,offset) => {
+        const sql = `SELECT * FROM categories WHERE category_name LIKE '%${searchCriteria.category_name}%' Limit ${options.limit} offset ${offset}`;
         const rows = await db.query(sql);
         return rows;
     },

@@ -4,8 +4,10 @@ export default {
 
     // 
     getAllTemplates: async (searchCriteria,options,offset) => {
-        const sql = `SELECT * FROM templates WHERE template_name LIKE '%${searchCriteria.template_name}%' Limit ${options.limit} offset ${offset}`;
-        console.log(searchCriteria,options,sql);
+        const sql = `SELECT t.*, c.category_name FROM templates as t
+                    left join categories as c
+                    on t.category_id = c.category_id 
+                    WHERE t.template_name LIKE '%${searchCriteria.template_name}%' Limit ${options.limit} offset ${offset}`;
         const rows = await db.query(sql);
         return rows;
     },
@@ -15,7 +17,7 @@ export default {
         const fields = Object.keys(dataObj);
         const values = fields.map((field) => `'${dataObj[field]}'`).join(',');
         const sql = `INSERT INTO templates (${fields.join(',')}) VALUES (${values})`;
-        console.log(sql);
+
         const rows = await db.query(sql);
         console.log(rows);
 
@@ -24,8 +26,11 @@ export default {
 
     //
     getTemplateById: async (template_id) =>{
-        const sql = `SELECT * FROM templates where template_id = ${template_id}`;
-        const rows = await db.query(sql);
+        const sql = `SELECT t.*, c.category_name FROM templates as t
+                    left join categories as c
+                    on t.category_id = c.category_id 
+                    WHERE t.template_id = ${template_id}`;
+        const [rows] = await db.query(sql);
         return rows;
     },
 

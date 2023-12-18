@@ -17,14 +17,15 @@ export default {
     createTemplate: async (req, res) => {
         console.log("create new template")
         try {
-            const { template_code, template_name, template_description  } = req.body;
+            const { category_id, template_code, template_name, template_description  } = req.body;
             const user_id = req?.user.userId;
-
+            const template_view_count = 0;
+            let template_download_count = 0;
             if(!template_name || !template_description){
               return res.status(401).send({ status: false, message: 'Template name & Template Description is required' });
             }
 
-            await template.createTemplate({user_id, template_name, template_description,template_code});
+            await template.createTemplate({user_id, category_id, template_name, template_description,template_code,template_view_count, template_download_count});
     
             return res.status(200).send({ status: true, message: 'Template created successfully' });
         } catch (error) {
@@ -37,7 +38,7 @@ export default {
         try {
             const { page = 1, limit = 10, search = '' } = req.query;
             const tableName = 'templates';
-            // Define the options for pagination
+
             const options = {
                 page: parseInt(page, 10),
                 limit: parseInt(limit, 10),
@@ -46,11 +47,10 @@ export default {
             
             // Define the search criteria
             const searchCriteria = {
-                // template_name: { $regex: new RegExp(search, 'i') }, // Case-insensitive search by name
                 template_name: req.query.search
             };
-            const data = await template.getAllTemplates(searchCriteria, options,offset);
             
+            const data = await template.getAllTemplates(searchCriteria, options,offset);
             // Calculate next and previous page numbers
             const totalCount = await template.tableCount(tableName);
             const totalPages = Math.ceil(totalCount[0].count / options.limit);
@@ -79,10 +79,10 @@ export default {
         const templateId = req.params.id;
         try {
             const foundTemplate = await template.getTemplateById(templateId);
-            if (foundTemplate.length<1) {
+            if (!foundTemplate) {
                 return res.status(404).send({ status: false, data:{}, message: 'Template not found' });
             }
-            return res.status(200).send({ status: true, data: foundTemplate[0] ,message: 'Template fetched successfully.' });
+            return res.status(200).send({ status: true, data: foundTemplate ,message: 'Template fetched successfully.' });
         } catch (error) {
             return res.status(500).send({ status: false, message: 'Internal server error', error });
         }
@@ -95,12 +95,13 @@ export default {
 
         try {
             const foundTemplate = await template.getTemplateById(templateId);
-            if (foundTemplate.length<1) {
+            if (!foundTemplate) {
                 return res.status(404).send({ status: false, data:foundTemplate, message: 'Template not found' });
             }
             else{
-                const updatedTemplate = await template.updateTemplateById(templateId, updateData);
-                return res.status(200).send({ status: true, message: 'Template updated successfully', updatedTemplate });
+                await template.updateTemplateById(templateId, updateData);
+                const updatedTemplate = await template.getTemplateById(templateId);
+                return res.status(200).send({ status: true, data:updatedTemplate ,message: 'Template updated successfully' });
             }
         } catch (error) {
             return res.status(500).send({ status: false, message: 'Internal server error', error });
