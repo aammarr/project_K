@@ -52,6 +52,7 @@ export default {
         return true;
     },
 
+    //
     tableCount: async(tableName)=>{
         const sql = `SELECT count(*) as  count FROM ${tableName}`;
         const rows = await db.query(sql);
