@@ -52,7 +52,6 @@ export default {
 
     // 
     updateCategoryById: async (req, res) => {
-        console.log("create ne category")
         try {
             const category_id= req?.params?.id;
             const category_name= req?.body?.category_name;
