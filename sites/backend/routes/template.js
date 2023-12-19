@@ -4,7 +4,7 @@ import Router from "express";
 
 const router = Router.Router();
 const { createTemplate, getAllTemplates, getTemplateById, updateTemplateById, deleteTemplateById, getAllTemplatesByCategoryId,
-    getUploadId, getSignedUrlMultipPart, fileSaveIntoDb, completeMultipartUpload, getSignedUrl,  } = templateController;
+    getUploadId, getSignedUrlMultipPart, fileSaveIntoDb, completeMultipartUpload, getSignedUrl } = templateController;
 
 
 router.get('/getSignedUrl', getSignedUrl);

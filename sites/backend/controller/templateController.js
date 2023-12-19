@@ -36,7 +36,7 @@ export default {
     // Get all templates
     getAllTemplates: async (req, res) => {
         try {
-            const { page = 1, limit = 10, search = '' } = req.query;
+            const { page = 1, limit = 10, search = ''} = req.query;
             const tableName = 'templates';
 
             const options = {
@@ -47,12 +47,13 @@ export default {
             
             // Define the search criteria
             const searchCriteria = {
-                template_name: req.query.search
+                template_name: req.query.search,
             };
             
             const data = await template.getAllTemplates(searchCriteria, options,offset);
+            
             // Calculate next and previous page numbers
-            const totalCount = await template.tableCount(tableName);
+            const totalCount = await template.getCountAllTemplates(tableName);
             const totalPages = Math.ceil(totalCount[0].count / options.limit);
             const nextPage = options.page < totalPages ? options.page + 1 : null;
             const prevPage = options.page > 1 ? options.page - 1 : null;
@@ -94,7 +95,7 @@ export default {
 
             const data = await template.getAllTemplatesByCategoryId(searchCriteria, options,offset);
             // Calculate next and previous page numbers
-            const totalCount = await template.tableCount(tableName);
+            const totalCount = await template.getCountAllTemplatesByCategoryId(searchCriteria,options,offset);
             const totalPages = Math.ceil(totalCount[0].count / options.limit);
             const nextPage = options.page < totalPages ? options.page + 1 : null;
             const prevPage = options.page > 1 ? options.page - 1 : null;
@@ -318,5 +319,46 @@ export default {
         catch(err){
             next(err);
         }
+    },
+
+    //
+    testgetAllFunciton:async(req,res,next)=>{
+        try{
+            const {page = 1, limit = 10, category_id = null} = req.query;
+            const options = {
+                page: parseInt(page, 10),
+                limit: parseInt(limit, 10),
+            };
+            const offset = (options.page - 1) * options.limit;
+            
+            // Define the search criteria
+            const searchCriteria = {
+                template_name: req.query.search
+            };
+            const categoryCondition = category_id ? `AND t.category_id = '${category_id}'` : '';
+            console.log('------1',offset, page, limit);
+            const data = await template.ammar(searchCriteria, categoryCondition, options, offset);
+            
+            // Calculate next and previous page numbers
+            // const totalCount = await template.getCountAllTemplates(searchCriteria, options,offset);
+            const totalPages = Math.ceil(data.count / options.limit);
+            const nextPage = options.page < totalPages ? options.page + 1 : null;
+            const prevPage = options.page > 1 ? options.page - 1 : null;
+            
+            return res.status(200).send({
+                status: true,
+                data:data.templates,
+                pagination:{
+                    totalResults:data.count,
+                    totalPages:totalPages,
+                    nextPage:nextPage,
+                    prevPage:prevPage,
+                },
+                message: 'Template fetched successfully.',
+            });
+        } catch (error) {
+            return res.status(500).send({ status: false, message: 'Internal server error', error });
+        }
+        
     }
 }

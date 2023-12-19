@@ -31,8 +31,6 @@ export default {
                 page: parseInt(page, 10),
                 limit: parseInt(limit, 10),
             };
-
-            
             const offset = (options.page - 1) * options.limit;
 
             const searchCriteria = {
