@@ -35,13 +35,13 @@ const _nav = [
   {
     component: CNavItem,
     name: 'Categories',
-    to: '/categories',
+    to: '/categories/1/25',
     icon: <CIcon icon={cilListRich} customClassName="nav-icon" />,
   },
   {
     component: CNavItem,
     name: 'Templates',
-    to: '/templates',
+    to: '/templates/1/25',
     icon: <CIcon icon={cilBook} customClassName="nav-icon" />,
   },
 ]

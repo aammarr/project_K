@@ -69,7 +69,7 @@ const UpdateCategory = () => {
       })
 
       toast.success('Category updated successfully', { position: toast.POSITION.TOP_RIGHT })
-      navigate('/categories')
+      navigate('/categories/1/25')
     } catch (error) {
       console.error('Error updating category:', error)
       toast.error(error?.response?.data?.message || 'Failed to update category', {

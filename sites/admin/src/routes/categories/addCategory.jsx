@@ -40,7 +40,7 @@ const AddCategory = () => {
       })
 
       toast.success('Category added successfully', { position: toast.POSITION.TOP_RIGHT })
-      navigate('/categories')
+      navigate('/categories/1/25')
     } catch (error) {
       console.error('Error adding category:', error)
       toast.error(error?.response?.data?.message || 'Failed to add category', {
