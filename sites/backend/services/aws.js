@@ -63,5 +63,14 @@ export default {
         
         const command = new CompleteMultipartUploadCommand(params);
         return client.send(command);
+    },
+
+    // Funciton getPutSignedUrl
+    getPutSignedUrl:async(bucket, key)=>{
+        const command = new PutObjectCommand({
+            Bucket: bucket,
+            Key: key
+        });
+        return getSignedUrl(client, command);
     }
 }

@@ -1,13 +1,26 @@
 import db from './dbConnection.js';
 
 export default {
-
+    
     // 
     getAllTemplates: async (searchCriteria,options,offset) => {
         const sql = `SELECT t.*, c.category_name FROM templates as t
                     left join categories as c
                     on t.category_id = c.category_id 
-                    WHERE t.template_name LIKE '%${searchCriteria.template_name}%' Limit ${options.limit} offset ${offset}`;
+                    WHERE t.template_name LIKE '%${searchCriteria.template_name}%'
+                    Limit ${options.limit} offset ${offset}`;
+        const rows = await db.query(sql);
+        return rows;
+    },
+
+    // 
+    getAllTemplatesByCategoryId: async (searchCriteria,options,offset) => {
+        const sql = `SELECT t.*, c.category_name FROM templates as t
+                    left join categories as c
+                    on t.category_id = c.category_id 
+                    WHERE t.category_id = '${searchCriteria.category_id}'
+                    AND t.template_name LIKE '%${searchCriteria.template_name}%'
+                    Limit ${options.limit} offset ${offset}`;
         const rows = await db.query(sql);
         return rows;
     },
@@ -17,9 +30,7 @@ export default {
         const fields = Object.keys(dataObj);
         const values = fields.map((field) => `'${dataObj[field]}'`).join(',');
         const sql = `INSERT INTO templates (${fields.join(',')}) VALUES (${values})`;
-
         const rows = await db.query(sql);
-        console.log(rows);
 
         return rows.insertId;
     },

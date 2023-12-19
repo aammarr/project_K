@@ -74,6 +74,48 @@ export default {
 
     },
 
+    // Get all templates
+    getAllTemplatesByCategoryId: async (req, res) => {
+        try {
+            const { page = 1, limit = 10, search = '' } = req.query;
+            const tableName = 'templates';
+
+            const options = {
+                page: parseInt(page, 10),
+                limit: parseInt(limit, 10),
+            };
+            const offset = (options.page - 1) * options.limit;
+            
+            // Define the search criteria
+            const searchCriteria = {
+                template_name: search,
+                category_id: req.params.category_id
+            };
+
+            const data = await template.getAllTemplatesByCategoryId(searchCriteria, options,offset);
+            // Calculate next and previous page numbers
+            const totalCount = await template.tableCount(tableName);
+            const totalPages = Math.ceil(totalCount[0].count / options.limit);
+            const nextPage = options.page < totalPages ? options.page + 1 : null;
+            const prevPage = options.page > 1 ? options.page - 1 : null;
+
+            return res.status(200).send({
+                status: true,
+                data:data,
+                pagination:{
+                    totalResults:totalCount[0].count,
+                    totalPages:totalPages,
+                    nextPage:nextPage,
+                    prevPage:prevPage,
+                },
+                message: 'Template fetched successfully.',
+            });
+        } catch (error) {
+            return res.status(500).send({ status: false, message: 'Internal server error', error });
+        }
+
+    },
+
     // Get template by ID
     getTemplateById: async (req, res) => {
         const templateId = req.params.id;
@@ -137,7 +179,6 @@ export default {
                 StorageClass: 'STANDARD'
             }
             const CreateMultipartUploadCommandResponse = await awsService.CreateMultipartUploadCommand(params);
-            console.log(CreateMultipartUploadCommandResponse);
             if(CreateMultipartUploadCommandResponse != ''){
                 return res.status(200).send({ 
                     status: true,
@@ -192,37 +233,6 @@ export default {
         }
     },
 
-    // fileSaveIntoDb
-    fileSaveIntoDb:async(req,res,next)=>{
-        try {
-            const fileInfo = {
-                document_id: lib.util.guid.generate(),
-                document_key: req.body?.key,
-                document_name: req.body?.name,
-                document_size: req.body?.size,
-                document_type: req.body?.content_type,
-                document_url: req.body?.url,
-                document: req.body?.url,
-                patient_id: req.body?.patient_id,
-                intake_id: req.body?.intake_id,
-                appointment_id: req.body?.appointment_id,
-                aba_screening_id: req.body?.aba_screening_id,
-                flag: req.body?.flag
-            };
-            // // save into db
-            lib.orm.documents.save(fileInfo);
-
-            res.status(200).json({
-                status: 200,
-                message: 'File saved into db successfully'
-            });
-        }
-        catch(err)
-        {
-            next(err);
-        }
-    },
-
     // function listMultipartUpload
     listMultipartUpload:async (req,res,next)=>{
         try{ 
@@ -258,4 +268,55 @@ export default {
             next(err);
         }
     },
+
+    // fileSaveIntoDb
+    fileSaveIntoDb:async(req,res,next)=>{
+        try {
+            const fileInfo = {
+                document_id: lib.util.guid.generate(),
+                document_key: req.body?.key,
+                document_name: req.body?.name,
+                document_size: req.body?.size,
+                document_type: req.body?.content_type,
+                document_url: req.body?.url,
+                document: req.body?.url,
+                patient_id: req.body?.patient_id,
+                intake_id: req.body?.intake_id,
+                appointment_id: req.body?.appointment_id,
+                aba_screening_id: req.body?.aba_screening_id,
+                flag: req.body?.flag
+            };
+            // // save into db
+            lib.orm.documents.save(fileInfo);
+
+            res.status(200).json({
+                status: 200,
+                message: 'File saved into db successfully'
+            });
+        }
+        catch(err)
+        {
+            next(err);
+        }
+    },
+
+    // 
+    getSignedUrl: async(req,res,next) =>{
+        try{
+            const prefix = 'project_k_templates/';
+            const bucketName = process.env.AWS_BUCKET;
+            const key = prefix+moment().format('YYYYMMDD_HHmmss') + "_" + req.query.name.replace(/ /g, '_');
+            const url = await awsService.getPutSignedUrl(bucketName, key);
+            return res.status(200).send({ 
+                data: {
+                    'url':url,
+                    'key':key
+                },
+                message: 'Signed url fetched successfully.'
+            });
+        }
+        catch(err){
+            next(err);
+        }
+    }
 }
