@@ -61,8 +61,16 @@ const routes = [
   { path: '/', exact: true, name: 'Home' },
   { path: '/dashboard', name: 'Dashboard', element: Dashboard },
   { path: '/users', name: 'Users', element: Users },
-  { path: '/categories', name: 'Categories', element: Categories },
-  { path: '/templates', name: 'Templates', element: Templates },
+  {
+    path: '/categories/:page/:limit/:search?',
+    name: 'Categories',
+    element: Categories,
+  },
+  {
+    path: '/templates/:page/:limit/:search?',
+    name: 'Templates',
+    element: Templates,
+  },
   { path: '/categories/add', name: 'Add Category', element: AddCategory },
   { path: '/categories/update/:id', name: 'Update Category', element: UpdateCategory },
 

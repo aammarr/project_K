@@ -1,12 +1,14 @@
 /* eslint-disable prettier/prettier */
 import React, { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import {
   CButton,
   CCard,
   CCardBody,
   CCardHeader,
   CCol,
+  CFormInput,
+  CInputGroup,
   CModal,
   CModalBody,
   CModalFooter,
@@ -24,20 +26,27 @@ import {
 import { toast } from 'react-toastify'
 import axiosInstance from 'src/axios/axiosConfig'
 import Pagination from '@mui/material/Pagination'
+import CIcon from '@coreui/icons-react'
+import { cilSearch } from '@coreui/icons' // Import search icon
 
 const Categories = () => {
+  const { page, limit, search } = useParams()
+
   const navigate = useNavigate()
   const [categories, setCategories] = useState([])
   const [selectedCategoryId, setSelectedCategoryId] = useState(null)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [currentPage, setCurrentPage] = useState(1)
+  const [currentPage, setCurrentPage] = useState(parseInt(page))
   const [totalPages, setTotalPages] = useState(0)
   const [totalItems, setTotalItems] = useState(0)
   const itemsPerPage = 25 // Adjust the number of items per page as needed
 
+  const [searchText, setSearchText] = useState(search)
+
+  console.log(page, limit, search)
   const handleButtonClick = () => {
-    navigate('add')
+    navigate('/categories/add')
   }
 
   useEffect(() => {
@@ -45,7 +54,7 @@ const Categories = () => {
       try {
         setLoading(true) // Set loading to true before making the API call
         const response = await axiosInstance.get(
-          `category?page=${currentPage}&limit=${itemsPerPage}&search=`,
+          `category?page=${page}&limit=${limit}&search=${search ? search : ''}`,
         )
         setCategories(response?.data?.data)
         setTotalPages(response?.data?.pagination?.totalPages)
@@ -59,10 +68,10 @@ const Categories = () => {
     }
 
     fetchCategories()
-  }, [currentPage])
+  }, [page, limit, search])
 
   const handleUpdateCategory = (categoryId) => {
-    navigate(`update/${categoryId}`)
+    navigate(`/categories/update/${categoryId}`)
   }
 
   const handleDeleteCategory = (categoryId) => {
@@ -75,11 +84,14 @@ const Categories = () => {
       await axiosInstance.delete(`category/${selectedCategoryId}`)
       // After deletion, re-fetch data for the current page
       const response = await axiosInstance.get(
-        `category?page=${currentPage}&limit=${itemsPerPage}&search=`,
+        `category?page=${page}&limit=${limit}&search=${searchText ? searchText : ''}`,
       )
       setCategories(response?.data?.data)
       setShowDeleteModal(false)
       toast.success('Category deleted successfully')
+      setCurrentPage(1)
+
+      navigate(`/categories/1/${limit}/${searchText ? searchText : ''}`)
     } catch (error) {
       console.error('Error deleting category:', error)
       toast.error('Error deleting category')
@@ -93,7 +105,24 @@ const Categories = () => {
   const handlePageChange = (event, page) => {
     // Update the current page when the page changes
     console.log(page)
-    setCurrentPage(page)
+    navigate(`/categories/${page}/${limit}/${searchText ? searchText : ''}`)
+  }
+
+  const handleSearch = () => {
+    // Your search logic here
+    console.log('Search:', searchText)
+    window.location = `/categories/1/${limit}/${searchText}`
+  }
+
+  const handleInputChange = (event) => {
+    setSearchText(event.target.value)
+  }
+
+  const handleKeyPress = (event) => {
+    // Check if the pressed key is the "Enter" key (key code 13)
+    if (event.key === 'Enter') {
+      handleSearch()
+    }
   }
 
   return (
@@ -105,7 +134,36 @@ const Categories = () => {
               <div
                 style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
               >
-                <div> Categories</div>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                  }}
+                >
+                  <div style={{ marginRight: '40px' }}>Categories</div>
+                  <div>
+                    <CInputGroup>
+                      <CFormInput
+                        placeholder="Search Categories"
+                        aria-label="Recipient's username"
+                        aria-describedby="button-addon2"
+                        onChange={handleInputChange}
+                        onKeyDown={handleKeyPress}
+                        value={searchText}
+                      />
+                      <CButton
+                        type="button"
+                        color="secondary"
+                        variant="outline"
+                        id="button-addon2"
+                        onClick={handleSearch}
+                      >
+                        <CIcon icon={cilSearch} size="sm" />
+                      </CButton>
+                    </CInputGroup>
+                  </div>
+                </div>
                 <div className="ml-auto">
                   <CButton color="primary" onClick={handleButtonClick}>
                     Add New Category
@@ -162,7 +220,12 @@ const Categories = () => {
               <br />
 
               <div style={{ display: 'flex', justifyContent: 'center' }}>
-                <Pagination count={totalPages} color="primary" onChange={handlePageChange} />
+                <Pagination
+                  count={totalPages}
+                  color="primary"
+                  onChange={handlePageChange}
+                  defaultPage={currentPage}
+                />
               </div>
             </CCardBody>
           </CCard>

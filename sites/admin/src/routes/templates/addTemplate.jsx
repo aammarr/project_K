@@ -68,7 +68,7 @@ const AddTemplate = () => {
       })
 
       toast.success('Template added successfully', { position: toast.POSITION.TOP_RIGHT })
-      navigate('/templates')
+      navigate('/templates/1/25')
     } catch (error) {
       console.error('Error adding template:', error)
       toast.error(error?.response?.data?.message || 'Failed to add template', {
