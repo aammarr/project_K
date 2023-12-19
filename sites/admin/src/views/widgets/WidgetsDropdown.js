@@ -13,7 +13,8 @@ import { CChartBar, CChartLine } from '@coreui/react-chartjs'
 import CIcon from '@coreui/icons-react'
 import { cilArrowBottom, cilArrowTop, cilOptions } from '@coreui/icons'
 
-const WidgetsDropdown = () => {
+const WidgetsDropdown = (stats) => {
+  console.log(stats?.stats)
   return (
     <CRow>
       <CCol sm={6} lg={3}>
@@ -22,10 +23,10 @@ const WidgetsDropdown = () => {
           color="primary"
           value={
             <>
-              26K{' '}
-              <span className="fs-6 fw-normal">
+              {stats?.stats?.users}
+              {/* <span className="fs-6 fw-normal">
                 (-12.4% <CIcon icon={cilArrowBottom} />)
-              </span>
+              </span> */}
             </>
           }
           title="Users"
@@ -109,13 +110,13 @@ const WidgetsDropdown = () => {
           color="info"
           value={
             <>
-              $6.200{' '}
-              <span className="fs-6 fw-normal">
+              {stats?.stats?.templates}{' '}
+              {/* <span className="fs-6 fw-normal">
                 (40.9% <CIcon icon={cilArrowTop} />)
-              </span>
+              </span> */}
             </>
           }
-          title="Income"
+          title="Templates"
           action={
             <CDropdown alignment="end">
               <CDropdownToggle color="transparent" caret={false} className="p-0">
@@ -195,13 +196,13 @@ const WidgetsDropdown = () => {
           color="warning"
           value={
             <>
-              2.49{' '}
-              <span className="fs-6 fw-normal">
+              {stats?.stats?.categories}{' '}
+              {/* <span className="fs-6 fw-normal">
                 (84.7% <CIcon icon={cilArrowTop} />)
-              </span>
+              </span> */}
             </>
           }
-          title="Conversion Rate"
+          title="Categories"
           action={
             <CDropdown alignment="end">
               <CDropdownToggle color="transparent" caret={false} className="p-0">

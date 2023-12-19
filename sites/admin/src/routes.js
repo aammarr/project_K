@@ -8,8 +8,8 @@ const Categories = React.lazy(() => import('./routes/categories/categories'))
 const Templates = React.lazy(() => import('./routes/templates/templates'))
 const AddCategory = React.lazy(() => import('./routes/categories/addCategory'))
 const UpdateCategory = React.lazy(() => import('./routes/categories/updateCategory'))
-
 const addTemplate = React.lazy(() => import('./routes/templates/addTemplate'))
+const UpdateTemplate = React.lazy(() => import('./routes/templates/updateTemplate'))
 
 // Base
 const Accordion = React.lazy(() => import('./views/base/accordion/Accordion'))
@@ -67,6 +67,7 @@ const routes = [
   { path: '/categories/update/:id', name: 'Update Category', element: UpdateCategory },
 
   { path: '/templates/add', name: 'Add Template', element: addTemplate },
+  { path: '/templates/update/:id', name: 'Update Template', element: UpdateTemplate },
 
   { path: '/theme', name: 'Theme', element: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', element: Colors },

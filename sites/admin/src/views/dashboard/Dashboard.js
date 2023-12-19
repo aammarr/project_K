@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
 import {
   CAvatar,
@@ -53,8 +53,21 @@ import avatar6 from 'src/assets/images/avatars/6.jpg'
 
 import WidgetsBrand from '../widgets/WidgetsBrand'
 import WidgetsDropdown from '../widgets/WidgetsDropdown'
+import axiosInstance from 'src/axios/axiosConfig'
 
 const Dashboard = () => {
+  const [stats, setStats] = useState({})
+  useEffect(() => {
+    const getStats = async () => {
+      try {
+        const { data } = await axiosInstance.get('dashboard/stats')
+        setStats(data?.data)
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    getStats()
+  }, [])
   const random = (min, max) => Math.floor(Math.random() * (max - min + 1) + min)
 
   const progressExample = [
@@ -180,7 +193,7 @@ const Dashboard = () => {
 
   return (
     <>
-      <WidgetsDropdown />
+      <WidgetsDropdown stats={stats} />
       <CCard className="mb-4">
         <CCardBody>
           <CRow>

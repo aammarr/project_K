@@ -14,20 +14,21 @@ import {
   CSpinner,
 } from '@coreui/react'
 import axiosInstance from 'src/axios/axiosConfig'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
-const AddTemplate = () => {
+const UpdateTemplate = () => {
+  const { id } = useParams() // Retrieve the template ID from params
+  const navigate = useNavigate()
+
   const [templateName, setTemplateName] = useState('')
   const [templateDescription, setTemplateDescription] = useState('')
   const [templateCode, setTemplateCode] = useState('')
-  const [categories, setCategories] = useState([]) // State for categories dropdown
+  const [categories, setCategories] = useState([])
   const [categoryId, setCategoryId] = useState('')
   const [file, setFile] = useState(null)
   const [loading, setLoading] = useState(false)
-
-  const navigate = useNavigate()
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -42,9 +43,30 @@ const AddTemplate = () => {
 
     fetchCategories()
   }, [])
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch template data using the provided template ID
+        const response = await axiosInstance.get(`template/${id}`)
+        const templateData = response?.data?.data
 
-  const handleAddTemplate = async () => {
-    console.log('Adding template:', {
+        // Set the form fields with the retrieved data
+        setTemplateName(templateData.template_name)
+        setTemplateDescription(templateData.template_description)
+        setTemplateCode(templateData.template_code)
+        setCategoryId(templateData.category_id)
+      } catch (error) {
+        console.error('Error fetching template data:', error)
+        toast.error('Error fetching template data')
+      }
+    }
+
+    fetchData()
+  }, [id])
+
+  const handleUpdateTemplate = async () => {
+    console.log('Updating template:', {
+      id,
       templateName,
       templateDescription,
       templateCode,
@@ -60,18 +82,19 @@ const AddTemplate = () => {
 
       setLoading(true)
 
-      const response = await axiosInstance.post('template', {
+      // Update template data using the provided template ID
+      await axiosInstance.put(`template/${id}`, {
         template_name: templateName,
         template_description: templateDescription,
         template_code: templateCode,
-        category_id: categoryId, // Include the selected category ID
+        category_id: categoryId,
       })
 
-      toast.success('Template added successfully', { position: toast.POSITION.TOP_RIGHT })
+      toast.success('Template updated successfully', { position: toast.POSITION.TOP_RIGHT })
       navigate('/templates')
     } catch (error) {
-      console.error('Error adding template:', error)
-      toast.error(error?.response?.data?.message || 'Failed to add template', {
+      console.error('Error updating template:', error)
+      toast.error(error?.response?.data?.message || 'Failed to update template', {
         position: toast.POSITION.TOP_RIGHT,
       })
     } finally {
@@ -83,7 +106,7 @@ const AddTemplate = () => {
     <CRow className="justify-content-center">
       <CCol xs="12" md="6">
         <CCard>
-          <CCardHeader>Add template</CCardHeader>
+          <CCardHeader>Update Template</CCardHeader>
           <CCardBody>
             <CForm>
               <CFormLabel htmlFor="templateName">Template Name</CFormLabel>
@@ -130,7 +153,7 @@ const AddTemplate = () => {
               <CFormLabel htmlFor="file">Upload File</CFormLabel>
               <CFormInput type="file" id="file" onChange={(e) => setFile(e.target.files[0])} />
 
-              <CButton color="primary" onClick={handleAddTemplate} style={{ marginTop: '20px' }}>
+              <CButton color="primary" onClick={handleUpdateTemplate} style={{ marginTop: '20px' }}>
                 {loading ? (
                   <>
                     <CSpinner
@@ -140,11 +163,11 @@ const AddTemplate = () => {
                       role="status"
                       aria-hidden="true"
                     />
-                    <span style={{ marginLeft: '5px' }}> Adding... </span>
+                    <span style={{ marginLeft: '5px' }}> Updating... </span>
                   </>
                 ) : (
-                  'Add Template'
-                )}{' '}
+                  'Update Template'
+                )}
               </CButton>
             </CForm>
           </CCardBody>
@@ -154,4 +177,4 @@ const AddTemplate = () => {
   )
 }
 
-export default AddTemplate
+export default UpdateTemplate

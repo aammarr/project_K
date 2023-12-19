@@ -13,6 +13,7 @@ import {
   CModalHeader,
   CModalTitle,
   CRow,
+  CSpinner,
   CTable,
   CTableBody,
   CTableDataCell,
@@ -22,28 +23,43 @@ import {
 } from '@coreui/react'
 import { toast } from 'react-toastify'
 import axiosInstance from 'src/axios/axiosConfig'
+import Pagination from '@mui/material/Pagination'
 
 const Categories = () => {
   const navigate = useNavigate()
   const [categories, setCategories] = useState([])
   const [selectedCategoryId, setSelectedCategoryId] = useState(null)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [loading, setLoading] = useState(true)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(0)
+  const [totalItems, setTotalItems] = useState(0)
+  const itemsPerPage = 25 // Adjust the number of items per page as needed
+
   const handleButtonClick = () => {
     navigate('add')
   }
+
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axiosInstance.get('category')
+        setLoading(true) // Set loading to true before making the API call
+        const response = await axiosInstance.get(
+          `category?page=${currentPage}&limit=${itemsPerPage}&search=`,
+        )
         setCategories(response?.data?.data)
+        setTotalPages(response?.data?.pagination?.totalPages)
+        setTotalItems(response?.data?.pagination?.totalResults)
       } catch (error) {
         console.error('Error fetching categories:', error)
         toast.error('Error fetching categories')
+      } finally {
+        setLoading(false) // Set loading to false after the API call is complete
       }
     }
 
     fetchCategories()
-  }, [])
+  }, [currentPage])
 
   const handleUpdateCategory = (categoryId) => {
     navigate(`update/${categoryId}`)
@@ -57,7 +73,10 @@ const Categories = () => {
   const handleDeleteConfirmation = async () => {
     try {
       await axiosInstance.delete(`category/${selectedCategoryId}`)
-      const response = await axiosInstance.get('category')
+      // After deletion, re-fetch data for the current page
+      const response = await axiosInstance.get(
+        `category?page=${currentPage}&limit=${itemsPerPage}&search=`,
+      )
       setCategories(response?.data?.data)
       setShowDeleteModal(false)
       toast.success('Category deleted successfully')
@@ -67,9 +86,14 @@ const Categories = () => {
     }
   }
 
-  // Handle "No" button click in the delete confirmation modal
   const handleCancelDelete = () => {
     setShowDeleteModal(false)
+  }
+
+  const handlePageChange = (event, page) => {
+    // Update the current page when the page changes
+    console.log(page)
+    setCurrentPage(page)
   }
 
   return (
@@ -90,41 +114,56 @@ const Categories = () => {
               </div>
             </CCardHeader>
             <CCardBody>
-              <CTable align="middle" className="mb-0 border" hover responsive>
-                <CTableHead color="light">
-                  <CTableRow>
-                    <CTableHeaderCell>Category ID</CTableHeaderCell>
-                    <CTableHeaderCell>Category Name</CTableHeaderCell>
-                    <CTableHeaderCell>Category Description</CTableHeaderCell>
-                    <CTableHeaderCell>Category Code</CTableHeaderCell>
-                    <CTableHeaderCell>Actions</CTableHeaderCell>
-                  </CTableRow>
-                </CTableHead>
-                <CTableBody>
-                  {categories.map((category) => (
-                    <CTableRow key={category.category_id}>
-                      <CTableDataCell>{category.category_id}</CTableDataCell>
-                      <CTableDataCell>{category.category_name}</CTableDataCell>
-                      <CTableDataCell>{category.category_description}</CTableDataCell>
-                      <CTableDataCell>{category.category_code}</CTableDataCell>
-                      <CTableDataCell>
-                        <CButton
-                          color="info"
-                          onClick={() => handleUpdateCategory(category.category_id)}
-                        >
-                          Update
-                        </CButton>{' '}
-                        <CButton
-                          color="danger"
-                          onClick={() => handleDeleteCategory(category.category_id)}
-                        >
-                          Delete
-                        </CButton>
-                      </CTableDataCell>
-                    </CTableRow>
-                  ))}
-                </CTableBody>
-              </CTable>
+              {loading ? (
+                <div className="text-center">
+                  <CSpinner color="primary" size="lg" />
+                </div>
+              ) : (
+                <>
+                  <CTable align="middle" className="mb-0 border" hover responsive>
+                    <CTableHead color="light">
+                      <CTableRow>
+                        <CTableHeaderCell>Category ID</CTableHeaderCell>
+                        <CTableHeaderCell>Category Name</CTableHeaderCell>
+                        <CTableHeaderCell>Category Description</CTableHeaderCell>
+                        <CTableHeaderCell>Category Code</CTableHeaderCell>
+                        <CTableHeaderCell>Actions</CTableHeaderCell>
+                      </CTableRow>
+                    </CTableHead>
+                    <CTableBody>
+                      {categories.map((category) => (
+                        <CTableRow key={category.category_id}>
+                          <CTableDataCell>{category.category_id}</CTableDataCell>
+                          <CTableDataCell>{category.category_name}</CTableDataCell>
+                          <CTableDataCell>{category.category_description}</CTableDataCell>
+                          <CTableDataCell>{category.category_code}</CTableDataCell>
+                          <CTableDataCell>
+                            <CButton
+                              color="info"
+                              onClick={() => handleUpdateCategory(category.category_id)}
+                            >
+                              Update
+                            </CButton>{' '}
+                            <CButton
+                              color="danger"
+                              onClick={() => handleDeleteCategory(category.category_id)}
+                            >
+                              Delete
+                            </CButton>
+                          </CTableDataCell>
+                        </CTableRow>
+                      ))}
+                    </CTableBody>
+                  </CTable>
+                  <br />
+                  <span>Total Results: {totalItems}</span>
+                </>
+              )}
+              <br />
+
+              <div style={{ display: 'flex', justifyContent: 'center' }}>
+                <Pagination count={totalPages} color="primary" onChange={handlePageChange} />
+              </div>
             </CCardBody>
           </CCard>
         </CCol>
