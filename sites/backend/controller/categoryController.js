@@ -5,7 +5,6 @@ import template from "../models/template.js";
 export default {
     //Add Category Function
     createCategory: async (req, res) => {
-        console.log("create new category")
         try {
             const { category_name,category_description,category_code } = req.body;
             const user_id = req?.user.userId;
@@ -22,7 +21,7 @@ export default {
         }
     },
 
-    // 
+    // Get All Category Function
     getCategories: async (req, res) => {
         try {
             const { page = 1, limit = 10, search = '' } = req.query;
@@ -66,7 +65,7 @@ export default {
         }
     },
     
-    // 
+    // Get Category By Id Function
     getCategoryById: async (req, res) => {
         console.log("get categories by id");
         try {
@@ -84,7 +83,7 @@ export default {
         }
     },
 
-    // 
+    // Update Category By Id Function
     updateCategoryById: async (req, res) => {
         try {
             const category_id= req?.params?.id;
@@ -110,7 +109,7 @@ export default {
         }
     },
 
-    //   
+    // Delete Category By Id Function
     deleteCategoryById: async (req, res) => {
         console.log("delete category by id");
         try {

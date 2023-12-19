@@ -125,11 +125,11 @@ export default {
         }
     },
 
-     // function getUploadId
+    // function getUploadId
     getUploadId: async (req,res) => {
         try {
             const prefix = 'project_k_templates/'+moment().format('YYYYMMDD_HHmmss') + "_";
-            const key = prefix+req.body?.key.replace(/ /g, '_');
+            const key = prefix+req.body?.name.replace(/ /g, '_');
 
             const params ={
                 Bucket: process.env.AWS_BUCKET,
@@ -137,14 +137,14 @@ export default {
                 StorageClass: 'STANDARD'
             }
             const CreateMultipartUploadCommandResponse = await awsService.CreateMultipartUploadCommand(params);
-
+            console.log(CreateMultipartUploadCommandResponse);
             if(CreateMultipartUploadCommandResponse != ''){
                 return res.status(200).send({ 
                     status: true,
                     response:{
-                        uploadId:CreateMultipartUploadCommandResponse.UploadId,
+                        createMultipartUploadResponse : CreateMultipartUploadCommandResponse,
                     },
-                    message: 'Upload Id updated successfully',
+                    message: 'Upload Id fethced successfully',
                 });
             }
             else{
