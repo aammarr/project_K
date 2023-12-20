@@ -17,6 +17,7 @@ import axiosInstance from 'src/axios/axiosConfig'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import moment from 'moment'
 
 const AddTemplate = () => {
   const [templateName, setTemplateName] = useState('')
@@ -42,6 +43,33 @@ const AddTemplate = () => {
 
     fetchCategories()
   }, [])
+
+  const handleFileUpload = async (event) => {
+    setFile(event.target.files[0])
+    const newFile = event.target.files[0]
+    console.log(newFile)
+
+    if (newFile?.size > 5242880) {
+      console.log('file is bigger than 5 mb')
+
+      const chunkSize = 5 * 1024 * 1024
+      const formData = new FormData()
+      formData.append('key', newFile?.name)
+      // upload to s3
+
+      const responseOne = await axiosInstance.post('template/initiateUpload', formData)
+      const uploadId = responseOne?.uploadId
+
+      const totalChunks = Math.ceil(newFile.size / chunkSize)
+      const prefix = 'project_k_templates/' + moment().format('YYYYMMDD_HHmmss') + '_'
+      const formDataTwo = new FormData()
+      formDataTwo.append('name', newFile?.name)
+      formDataTwo.append('content_type', newFile?.type)
+      formDataTwo.append('uploadId', uploadId)
+      formDataTwo.append('totalParts', totalChunks)
+      formDataTwo.append('key', prefix)
+    }
+  }
 
   const handleAddTemplate = async () => {
     console.log('Adding template:', {
@@ -128,7 +156,7 @@ const AddTemplate = () => {
               </CFormSelect>
 
               <CFormLabel htmlFor="file">Upload File</CFormLabel>
-              <CFormInput type="file" id="file" onChange={(e) => setFile(e.target.files[0])} />
+              <CFormInput type="file" id="file" onChange={handleFileUpload} />
 
               <CButton color="primary" onClick={handleAddTemplate} style={{ marginTop: '20px' }}>
                 {loading ? (
