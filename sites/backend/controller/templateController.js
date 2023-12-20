@@ -172,7 +172,8 @@ export default {
     getUploadId: async (req,res) => {
         try {
             const prefix = 'project_k_templates/'+moment().format('YYYYMMDD_HHmmss') + "_";
-            const key = prefix+req.body?.name.replace(/ /g, '_');
+            // const key = prefix+req.body?.name.replace(/ /g, '_');
+            const key = prefix + (req.body?.name ? req.body.name.replace(/ /g, '_') : '');
 
             const params ={
                 Bucket: process.env.AWS_BUCKET,
@@ -253,10 +254,10 @@ export default {
     completeMultipartUpload:async (req,res,next)=>{
         try{
             const s3Params = {
-                Bucket: global.config.aws.bucket,
-                Key: req.body.key,
-                UploadId: req.body.uploadId,
-                MultipartUpload: req.body.ETagsArray
+                Bucket: process.env.AWS_BUCKET,
+                Key: req.body?.key,
+                UploadId: req.body?.uploadId,
+                MultipartUpload: req.body?.ETagsArray
             }
             let response =  await awsService.completeMultipartUpload(s3Params.Bucket, s3Params.Key, s3Params.UploadId, s3Params.MultipartUpload);
             return res.json({

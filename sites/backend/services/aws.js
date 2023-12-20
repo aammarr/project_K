@@ -49,7 +49,8 @@ export default {
         // Complete the multipart upload
         const PartsParts = responseListParts.map((item) => ({
             PartNumber: item.PartNumber,
-            ETag: item.ETag.replace(/"/g, ''), // Remove double quotes from ETag
+            // ETag: item.ETag.replace(/"/g, ''), // Remove double quotes from ETag
+            ETag: item.ETag ? item.ETag.replace(/"/g, '') : undefined
         }));
         
         const params = {
