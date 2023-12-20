@@ -18,6 +18,7 @@ import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import moment from 'moment'
+import axios from 'axios'
 
 const AddTemplate = () => {
   const [templateName, setTemplateName] = useState('')
@@ -27,6 +28,7 @@ const AddTemplate = () => {
   const [categoryId, setCategoryId] = useState('')
   const [file, setFile] = useState(null)
   const [loading, setLoading] = useState(false)
+  let progress
 
   const navigate = useNavigate()
 
@@ -52,22 +54,106 @@ const AddTemplate = () => {
     if (newFile?.size > 5242880) {
       console.log('file is bigger than 5 mb')
 
+      console.log(newFile)
+
       const chunkSize = 5 * 1024 * 1024
+      const chunks = []
+      let uploadedChunks = 0
+      const uploadedEtags = []
+
       const formData = new FormData()
       formData.append('key', newFile?.name)
+
       // upload to s3
-
       const responseOne = await axiosInstance.post('template/initiateUpload', formData)
-      const uploadId = responseOne?.uploadId
-
+      const responseOneData = responseOne?.data?.response?.createMultipartUploadResponse
       const totalChunks = Math.ceil(newFile.size / chunkSize)
-      const prefix = 'project_k_templates/' + moment().format('YYYYMMDD_HHmmss') + '_'
+
       const formDataTwo = new FormData()
       formDataTwo.append('name', newFile?.name)
       formDataTwo.append('content_type', newFile?.type)
-      formDataTwo.append('uploadId', uploadId)
+      formDataTwo.append('uploadId', responseOneData?.UploadId)
       formDataTwo.append('totalParts', totalChunks)
-      formDataTwo.append('key', prefix)
+      formDataTwo.append('key', responseOneData?.Key)
+
+      // upload to multi signed part s3
+      const responseTwo = await axiosInstance.post('template/getSignedUrlMultipart', formDataTwo)
+      console.log(responseTwo)
+      const responseTwoSignedUrls = responseTwo?.data?.data?.signedUrls
+      console.log(responseTwoSignedUrls)
+
+      const uploadViaSignedUrlMultipart = async (preSignedUrl, key, doc, partNumber) => {
+        const fileKey = key
+        let uploadResponse = await axios.put(preSignedUrl, doc, {
+          headers: {
+            'Content-Type': newFile.type, // Set the content type to binary data
+          },
+        })
+        uploadedChunks++
+        progress = Math.floor((uploadedChunks / totalChunks) * 100)
+
+        uploadedEtags.push({
+          PartNumber: partNumber,
+          ETag: uploadResponse.headers.etag.replace(/"/g, ''),
+        })
+        const sortedParts = uploadedEtags.sort((a, b) => a.PartNumber - b.PartNumber)
+        console.log(sortedParts)
+        console.log(progress)
+        if (progress === 100) {
+          let completeUploadpPostData = {
+            key: responseOneData?.Key,
+            uploadId: responseOneData?.UploadId,
+            ETagsArray: sortedParts,
+          }
+          console.log(completeUploadpPostData)
+          let completeUploadResponse = await axiosInstance.post(
+            'template/complete-multipart-upload',
+            completeUploadpPostData,
+          )
+
+          console.log(completeUploadResponse)
+          if (completeUploadResponse?.status === 200) {
+            const body = {
+              content_type: newFile?.type,
+              name: newFile?.name,
+              size: newFile?.size,
+              key: responseOneData?.Key,
+              url: completeUploadResponse?.data?.data?.Location,
+            }
+            const responseFinal = await axiosInstance.post('template/file-save-into-db', body)
+            console.log(responseFinal)
+          }
+        } else {
+          console.log('save to db error')
+        }
+      }
+      for (let i = 1; i <= totalChunks; i++) {
+        const start = (i - 1) * chunkSize
+        const end = Math.min(i * chunkSize, newFile?.size)
+        const chunk = newFile.slice(start, end)
+        chunks.push(chunk)
+        uploadViaSignedUrlMultipart(responseTwoSignedUrls[i - 1], responseOneData?.Key, chunk, i)
+      }
+      console.log(chunks)
+
+      const uploadPromises = []
+
+      // for (let i = 0; i < responseTwoSignedUrls.length; i++) {
+      //   const signedUrl = responseTwoSignedUrls[i]
+      //   const chunk = chunks[i]
+
+      //   const uploadPromise = uploadViaSignedUrlMultipart(signedUrl, newFile.name, chunk, i + 1)
+      //   uploadPromises.push(uploadPromise)
+      // }
+
+      // try {
+      //   // Wait for all uploads to complete
+      //   await Promise.all(uploadPromises)
+      //   console.log('All uploads completed successfully')
+      // } catch (error) {
+      //   console.error('Error uploading chunks:', error)
+      //   // Handle error
+      // }
     }
   }
 
