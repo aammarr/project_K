@@ -56,25 +56,27 @@ export default {
 
     //
     getTemplateById: async (template_id) =>{
+        
         const sql = `SELECT t.*, c.category_name FROM templates as t
-                    left join categories as c
-                    on t.category_id = c.category_id 
-                    WHERE t.template_id = ${template_id}`;
+        left join categories as c
+        on t.category_id = c.category_id 
+        WHERE t.template_id = ${template_id}`;
         const [rows] = await db.query(sql);
+
         return rows;
     },
 
     //
     updateTemplateById: async (id,category_data) => {
         let sql = 'UPDATE templates SET';
-            const fields = Object.keys(category_data);
-            for (let i = 0; i < fields.length; i++) {
-            sql += ` ${fields[i]} = '${category_data[fields[i]]}',`;
-            }
-            sql = sql.slice(0, -1); 
-            sql += ` WHERE template_id = ${id}`;
+        const fields = Object.keys(category_data);
+        for (let i = 0; i < fields.length; i++) {
+        sql += ` ${fields[i]} = '${category_data[fields[i]]}',`;
+        }
+        sql = sql.slice(0, -1); 
+        sql += ` WHERE template_id = ${id}`;
 
-            return await db.query(sql);
+        return await db.query(sql);
     },
 
     //

@@ -73,5 +73,23 @@ export default {
             Key: key
         });
         return getSignedUrl(client, command);
+    },
+
+    // Funciton getSignedUrlDownload
+    getSignedUrlDownload:async(bucket, key)=>{
+        return new Promise(async (resolve, reject) => {
+            try{
+                const command = new GetObjectCommand({
+                    Bucket: bucket,
+                    Key: key,
+                    expiresIn: 15 * 60
+                });
+                const signedUrl = await getSignedUrl(client, command );
+                return resolve(signedUrl);
+            }
+            catch(err){
+                return reject('Error');
+            }
+        });
     }
 }

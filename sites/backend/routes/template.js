@@ -4,10 +4,11 @@ import Router from "express";
 
 const router = Router.Router();
 const { createTemplate, getAllTemplates, getTemplateById, updateTemplateById, deleteTemplateById, getAllTemplatesByCategoryId,
-    getUploadId, getSignedUrlMultipPart, fileSaveIntoDb, completeMultipartUpload, getSignedUrl } = templateController;
+    getUploadId, getSignedUrlMultipPart, fileSaveIntoDb, completeMultipartUpload, getPutSignedUrl } = templateController;
 
 
-router.get('/getSignedUrl', getSignedUrl);
+router.get('/getPutSignedUrl', getPutSignedUrl);
+
 router.post('/initiateUpload', getUploadId);
 router.post('/getSignedUrlMultipart', getSignedUrlMultipPart);
 router.post('/complete-multipart-upload', completeMultipartUpload);

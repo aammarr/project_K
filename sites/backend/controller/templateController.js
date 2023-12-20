@@ -17,15 +17,22 @@ export default {
     createTemplate: async (req, res) => {
         console.log("create new template")
         try {
-            const { category_id, template_code, template_name, template_description  } = req.body;
+
+            const { category_id, template_code, template_name, template_description,
+                template_key, template_size,template_type,template_url
+            } = req.body;
+
             const user_id = req?.user.userId;
             const template_view_count = 0;
-            let template_download_count = 0;
-            if(!template_name || !template_description){
-              return res.status(401).send({ status: false, message: 'Template name & Template Description is required' });
+            const template_download_count = 0;
+            if(!template_name || !template_description || !template_url){
+              return res.status(401).send({ status: false, message: 'Template name, Template Description & Template URL is required' });
             }
 
-            await template.createTemplate({user_id, category_id, template_name, template_description,template_code,template_view_count, template_download_count});
+            await template.createTemplate({user_id, category_id,template_code, template_name, template_description,
+                template_key, template_size,template_type,template_url,
+                template_view_count, template_download_count
+            });
     
             return res.status(200).send({ status: true, message: 'Template created successfully' });
         } catch (error) {
@@ -53,7 +60,7 @@ export default {
             const data = await template.getAllTemplates(searchCriteria, options,offset);
             
             // Calculate next and previous page numbers
-            const totalCount = await template.getCountAllTemplates(tableName);
+            const totalCount = await template.tableCount(tableName);
             const totalPages = Math.ceil(totalCount[0].count / options.limit);
             const nextPage = options.page < totalPages ? options.page + 1 : null;
             const prevPage = options.page > 1 ? options.page - 1 : null;
@@ -125,6 +132,9 @@ export default {
             if (!foundTemplate) {
                 return res.status(404).send({ status: false, data:{}, message: 'Template not found' });
             }
+            let viewCount = foundTemplate.template_view_count+1;
+            await template.updateTemplateById(foundTemplate.template_id,{"template_view_count":viewCount});
+
             return res.status(200).send({ status: true, data: foundTemplate ,message: 'Template fetched successfully.' });
         } catch (error) {
             return res.status(500).send({ status: false, message: 'Internal server error', error });
@@ -194,8 +204,7 @@ export default {
                 return res.status(500).send({ status: false, message: 'Internal server error', error });
             }
         } catch (error) {
-            console.error('Error generating upload ID:', error);
-            throw error;
+            return res.status(500).send({ status: false, message: 'Internal server error while getUploadId', error });
         }
     },
 
@@ -229,9 +238,8 @@ export default {
             },
             message: 'Url fetched successfuly.'
         });
-    }
-        catch(err){
-            next(err);
+        } catch (error) {
+            return res.status(500).send({ status: false, message: 'Internal server error while getSignedUrlMultipPart', error });
         }
     },
 
@@ -245,8 +253,8 @@ export default {
             }
             return await lib.util.s3.listMultipartUpload(params);
         }
-        catch(err){
-            next(err);
+        catch (error) {
+            return res.status(500).send({ status: false, message: 'Internal server error while listMultipartUpload', error });
         }
     },
 
@@ -266,8 +274,8 @@ export default {
                 message: 'Complete MultipartUpload successfuly.'
             });
         }
-        catch(err){
-            next(err);
+        catch (error) {
+            return res.status(500).send({ status: false, message: 'Internal server error while completeMultipartUpload', error });
         }
     },
 
@@ -275,21 +283,14 @@ export default {
     fileSaveIntoDb:async(req,res,next)=>{
         try {
             const fileInfo = {
-                document_id: lib.util.guid.generate(),
-                document_key: req.body?.key,
-                document_name: req.body?.name,
-                document_size: req.body?.size,
-                document_type: req.body?.content_type,
-                document_url: req.body?.url,
-                document: req.body?.url,
-                patient_id: req.body?.patient_id,
-                intake_id: req.body?.intake_id,
-                appointment_id: req.body?.appointment_id,
-                aba_screening_id: req.body?.aba_screening_id,
-                flag: req.body?.flag
+                template_key: req.body?.key,
+                template_name: req.body?.name,
+                template_size: req.body?.size,
+                template_type: req.body?.content_type,
+                template_url: req.body?.url
             };
-            // // save into db
-            lib.orm.documents.save(fileInfo);
+            // save into db
+
 
             res.status(200).json({
                 status: 200,
@@ -303,11 +304,11 @@ export default {
     },
 
     // 
-    getSignedUrl: async(req,res,next) =>{
+    getPutSignedUrl: async(req,res,next) =>{
         try{
-            const prefix = 'project_k_templates/';
             const bucketName = process.env.AWS_BUCKET;
-            const key = prefix+moment().format('YYYYMMDD_HHmmss') + "_" + req.query.name.replace(/ /g, '_');
+            const prefix = 'project_k_templates/'+moment().format('YYYYMMDD_HHmmss') + "_";
+            const key = prefix + (req.body?.name ? req.body.name.replace(/ /g, '_') : '');
             const url = await awsService.getPutSignedUrl(bucketName, key);
             return res.status(200).send({ 
                 data: {
@@ -315,6 +316,23 @@ export default {
                     'key':key
                 },
                 message: 'Signed url fetched successfully.'
+            });
+        }
+        catch (error) {
+            return res.status(500).send({ status: false, message: 'Internal server error getPutSignedUrl', error });
+        }
+    },
+
+    //
+    getDownloadUrl: async(req,res,next)=>{
+        try{
+            const bucketName = process.env.AWS_BUCKET;
+            const key = req.query.key;
+            const url = await awsService.getSignedUrlDownload(bucketName, key);
+            
+            return res.json({
+                data: url,
+                message: 'Url fetched successfuly.'
             });
         }
         catch(err){
