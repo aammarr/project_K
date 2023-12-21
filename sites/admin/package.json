@@ -16,6 +16,7 @@
     "build": "react-scripts build",
     "eject": "react-scripts eject",
     "lint": "eslint \"src/**/*.js\"",
+    "dev": "react-scripts start",
     "start": "NODE_ENV=production node_modules/react-scripts/bin/react-scripts.js start",
     "test": "react-scripts test",
     "test:cov": "npm test -- --coverage --watchAll=false",

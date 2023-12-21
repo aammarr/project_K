@@ -13,11 +13,11 @@ import {
   CRow,
   CSpinner,
 } from '@coreui/react'
+import { LinearProgress } from '@mui/material' // Import LinearProgress
 import axiosInstance from 'src/axios/axiosConfig'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import moment from 'moment'
 import axios from 'axios'
 
 const AddTemplate = () => {
@@ -26,9 +26,14 @@ const AddTemplate = () => {
   const [templateCode, setTemplateCode] = useState('')
   const [categories, setCategories] = useState([]) // State for categories dropdown
   const [categoryId, setCategoryId] = useState('')
+  const [templateType, setTemplateType] = useState('')
+  const [templateKey, setTemplateKey] = useState('')
+  const [templateSize, setTemplateSize] = useState('')
+  const [templateUrl, setTemplateUrl] = useState('')
+
   const [file, setFile] = useState(null)
   const [loading, setLoading] = useState(false)
-  let progress
+  const [progress, setProgress] = useState(0) // Progress state
 
   const navigate = useNavigate()
 
@@ -47,113 +52,125 @@ const AddTemplate = () => {
   }, [])
 
   const handleFileUpload = async (event) => {
-    setFile(event.target.files[0])
-    const newFile = event.target.files[0]
-    console.log(newFile)
+    try {
+      setFile(event.target.files[0])
+      const newFile = event.target.files[0]
 
-    if (newFile?.size > 5242880) {
-      console.log('file is bigger than 5 mb')
+      setTemplateKey('')
+      setTemplateUrl('')
+      setTemplateType('')
+      setTemplateSize('')
 
-      console.log(newFile)
+      if (newFile?.size < 5242880) {
+        setProgress(20)
+        console.log('file size is smaller than 5 mb')
+        const formData = new FormData()
+        formData.append('key', newFile?.name)
+        // upload to get signed URL
+        const responseOne = await axiosInstance.get('template/getPutSignedUrl', formData)
+        setProgress(50)
+        const signedUrl = responseOne?.data?.data?.url
+        const key = responseOne?.data?.data?.key
 
-      const chunkSize = 5 * 1024 * 1024
-      const chunks = []
-      let uploadedChunks = 0
-      const uploadedEtags = []
+        setTemplateKey(key)
+        setTemplateType(newFile?.type)
+        setTemplateSize(newFile?.size)
+        setTemplateUrl(key)
 
-      const formData = new FormData()
-      formData.append('key', newFile?.name)
-
-      // upload to s3
-      const responseOne = await axiosInstance.post('template/initiateUpload', formData)
-      const responseOneData = responseOne?.data?.response?.createMultipartUploadResponse
-      const totalChunks = Math.ceil(newFile.size / chunkSize)
-
-      const formDataTwo = new FormData()
-      formDataTwo.append('name', newFile?.name)
-      formDataTwo.append('content_type', newFile?.type)
-      formDataTwo.append('uploadId', responseOneData?.UploadId)
-      formDataTwo.append('totalParts', totalChunks)
-      formDataTwo.append('key', responseOneData?.Key)
-
-      // upload to multi signed part s3
-      const responseTwo = await axiosInstance.post('template/getSignedUrlMultipart', formDataTwo)
-      console.log(responseTwo)
-      const responseTwoSignedUrls = responseTwo?.data?.data?.signedUrls
-      console.log(responseTwoSignedUrls)
-
-      const uploadViaSignedUrlMultipart = async (preSignedUrl, key, doc, partNumber) => {
-        const fileKey = key
-        let uploadResponse = await axios.put(preSignedUrl, doc, {
+        // upload to API
+        await axios.put(signedUrl, key, newFile, {
           headers: {
-            'Content-Type': newFile.type, // Set the content type to binary data
+            'Content-Type': newFile.type,
           },
         })
-        uploadedChunks++
-        progress = Math.floor((uploadedChunks / totalChunks) * 100)
+        setProgress(100)
+      }
 
-        uploadedEtags.push({
-          PartNumber: partNumber,
-          ETag: uploadResponse.headers.etag.replace(/"/g, ''),
-        })
-        const sortedParts = uploadedEtags.sort((a, b) => a.PartNumber - b.PartNumber)
-        console.log(sortedParts)
-        console.log(progress)
-        if (progress === 100) {
-          let completeUploadpPostData = {
-            key: responseOneData?.Key,
-            uploadId: responseOneData?.UploadId,
-            ETagsArray: sortedParts,
-          }
-          console.log(completeUploadpPostData)
-          let completeUploadResponse = await axiosInstance.post(
-            'template/complete-multipart-upload',
-            completeUploadpPostData,
-          )
+      if (newFile?.size > 5242880) {
+        console.log('file is bigger than 5 mb')
 
-          console.log(completeUploadResponse)
-          if (completeUploadResponse?.status === 200) {
-            const body = {
-              content_type: newFile?.type,
-              name: newFile?.name,
-              size: newFile?.size,
+        const chunkSize = 5 * 1024 * 1024
+        const chunks = []
+        let uploadedChunks = 0
+        const uploadedEtags = []
+
+        const formData = new FormData()
+        formData.append('key', newFile?.name)
+
+        // upload to S3
+        const responseOne = await axiosInstance.post('template/initiateUpload', formData)
+        const responseOneData = responseOne?.data?.response?.createMultipartUploadResponse
+        const totalChunks = Math.ceil(newFile.size / chunkSize)
+
+        const formDataTwo = new FormData()
+        formDataTwo.append('name', newFile?.name)
+        formDataTwo.append('content_type', newFile?.type)
+        formDataTwo.append('uploadId', responseOneData?.UploadId)
+        formDataTwo.append('totalParts', totalChunks)
+        formDataTwo.append('key', responseOneData?.Key)
+
+        // upload to multi-signed part S3
+        const responseTwo = await axiosInstance.post('template/getSignedUrlMultipart', formDataTwo)
+        const responseTwoSignedUrls = responseTwo?.data?.data?.signedUrls
+
+        const uploadViaSignedUrlMultipart = async (preSignedUrl, key, doc, partNumber) => {
+          const fileKey = key
+          let uploadResponse = await axios.put(preSignedUrl, doc, {
+            headers: {
+              'Content-Type': newFile.type, // Set the content type to binary data
+            },
+          })
+          uploadedChunks++
+          setProgress(Math.floor((uploadedChunks / totalChunks) * 100))
+
+          uploadedEtags.push({
+            PartNumber: partNumber,
+            ETag: uploadResponse.headers.etag.replace(/"/g, ''),
+          })
+          const sortedParts = uploadedEtags.sort((a, b) => a.PartNumber - b.PartNumber)
+          console.log(sortedParts)
+          console.log(progress)
+          if (progress === 100) {
+            let completeUploadpPostData = {
               key: responseOneData?.Key,
-              url: completeUploadResponse?.data?.data?.Location,
+              uploadId: responseOneData?.UploadId,
+              ETagsArray: sortedParts,
             }
-            const responseFinal = await axiosInstance.post('template/file-save-into-db', body)
-            console.log(responseFinal)
+            console.log(completeUploadpPostData)
+            let completeUploadResponse = await axiosInstance.post(
+              'template/complete-multipart-upload',
+              completeUploadpPostData,
+            )
+
+            console.log(completeUploadResponse)
+            if (completeUploadResponse?.status === 200) {
+              const body = {
+                content_type: newFile?.type,
+                name: newFile?.name,
+                size: newFile?.size,
+                key: responseOneData?.Key,
+                url: completeUploadResponse?.data?.data?.Location,
+              }
+              setTemplateKey(responseOneData?.Key)
+              setTemplateSize(newFile?.size)
+              setTemplateType(newFile?.type)
+              setTemplateUrl(completeUploadResponse?.data?.data?.Location)
+            }
           }
-        } else {
-          console.log('save to db error')
+        }
+        for (let i = 1; i <= totalChunks; i++) {
+          const start = (i - 1) * chunkSize
+          const end = Math.min(i * chunkSize, newFile?.size)
+          const chunk = newFile.slice(start, end)
+          chunks.push(chunk)
+          uploadViaSignedUrlMultipart(responseTwoSignedUrls[i - 1], responseOneData?.Key, chunk, i)
         }
       }
-      for (let i = 1; i <= totalChunks; i++) {
-        const start = (i - 1) * chunkSize
-        const end = Math.min(i * chunkSize, newFile?.size)
-        const chunk = newFile.slice(start, end)
-        chunks.push(chunk)
-        uploadViaSignedUrlMultipart(responseTwoSignedUrls[i - 1], responseOneData?.Key, chunk, i)
-      }
-      console.log(chunks)
-
-      const uploadPromises = []
-
-      // for (let i = 0; i < responseTwoSignedUrls.length; i++) {
-      //   const signedUrl = responseTwoSignedUrls[i]
-      //   const chunk = chunks[i]
-
-      //   const uploadPromise = uploadViaSignedUrlMultipart(signedUrl, newFile.name, chunk, i + 1)
-      //   uploadPromises.push(uploadPromise)
-      // }
-
-      // try {
-      //   // Wait for all uploads to complete
-      //   await Promise.all(uploadPromises)
-      //   console.log('All uploads completed successfully')
-      // } catch (error) {
-      //   console.error('Error uploading chunks:', error)
-      //   // Handle error
-      // }
+    } catch (error) {
+      console.error('Error uploading file:', error)
+      toast.error(error?.message || 'Failed to upload file', {
+        position: toast.POSITION.TOP_RIGHT,
+      })
     }
   }
 
@@ -163,7 +180,10 @@ const AddTemplate = () => {
       templateDescription,
       templateCode,
       categoryId,
-      file,
+      templateKey,
+      templateSize,
+      templateUrl,
+      templateType,
     })
 
     try {
@@ -171,15 +191,32 @@ const AddTemplate = () => {
         toast.error('Please fill in all fields', { position: toast.POSITION.TOP_RIGHT })
         return
       }
+      if (!file) {
+        toast.error('Please select a file first.', { position: toast.POSITION.TOP_RIGHT })
+        return
+      }
+      if (!templateKey || !templateSize || !templateType) {
+        toast.error('Please wait for the file to upload.', { position: toast.POSITION.TOP_RIGHT })
+        return
+      }
 
       setLoading(true)
-
-      const response = await axiosInstance.post('template', {
+      const requestBody = {
         template_name: templateName,
         template_description: templateDescription,
         template_code: templateCode,
-        category_id: categoryId, // Include the selected category ID
-      })
+        category_id: categoryId,
+        template_key: templateKey,
+        template_size: templateSize,
+        template_type: templateType,
+      }
+
+      // Include template_url only if it's not an empty string
+      if (templateUrl !== '') {
+        requestBody.template_url = templateUrl
+      }
+
+      const response = await axiosInstance.post('template', requestBody)
 
       toast.success('Template added successfully', { position: toast.POSITION.TOP_RIGHT })
       navigate('/templates/1/25')
@@ -243,6 +280,15 @@ const AddTemplate = () => {
 
               <CFormLabel htmlFor="file">Upload File</CFormLabel>
               <CFormInput type="file" id="file" onChange={handleFileUpload} />
+
+              {/* Display progress bar when file is being uploaded */}
+              {progress > 0 && progress < 100 && (
+                <LinearProgress
+                  variant="determinate"
+                  value={progress}
+                  style={{ marginTop: '10px' }}
+                />
+              )}
 
               <CButton color="primary" onClick={handleAddTemplate} style={{ marginTop: '20px' }}>
                 {loading ? (

@@ -47,6 +47,14 @@ const Templates = () => {
     navigate('/templates/add')
   }
 
+  const handleDownloadTemplate = async (key) => {
+    console.log(key)
+    const responseOne = await axiosInstance.get(
+      `template/getSignedUrlDownload?type=get&name=${key}`,
+    )
+    console.log(responseOne)
+  }
+
   useEffect(() => {
     const fetchTemplates = async () => {
       try {
@@ -181,9 +189,10 @@ const Templates = () => {
                         <CTableHeaderCell>Template ID</CTableHeaderCell>
                         <CTableHeaderCell>Template Name</CTableHeaderCell>
                         <CTableHeaderCell>Category Name</CTableHeaderCell>
-
                         <CTableHeaderCell>Template Description</CTableHeaderCell>
                         <CTableHeaderCell>Template Code</CTableHeaderCell>
+                        <CTableHeaderCell>Views</CTableHeaderCell>
+
                         <CTableHeaderCell>Actions</CTableHeaderCell>
                       </CTableRow>
                     </CTableHead>
@@ -196,7 +205,17 @@ const Templates = () => {
 
                           <CTableDataCell>{template.template_description}</CTableDataCell>
                           <CTableDataCell>{template.template_code}</CTableDataCell>
+                          <CTableDataCell>{template.template_view_count}</CTableDataCell>
+
                           <CTableDataCell>
+                            {template?.template_key && (
+                              <CButton
+                                color="info"
+                                onClick={() => handleDownloadTemplate(template.template_key)}
+                              >
+                                Download
+                              </CButton>
+                            )}
                             <CButton
                               color="info"
                               onClick={() => handleUpdatetemplate(template.template_id)}
