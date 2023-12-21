@@ -15,7 +15,6 @@ export default {
     
     // 
     createTemplate: async (req, res) => {
-        console.log("create new template")
         try {
 
             const { category_id, template_code, template_name, template_description,
@@ -230,7 +229,6 @@ export default {
                 signedUrls.push(url);
                 
             }
-        console.log(signedUrls);
         return res.json({
             data: {
                 'signedUrls':signedUrls,
@@ -308,7 +306,7 @@ export default {
         try{
             const bucketName = process.env.AWS_BUCKET;
             const prefix = 'project_k_templates/'+moment().format('YYYYMMDD_HHmmss') + "_";
-            const key = prefix + (req.body?.name ? req.body.name.replace(/ /g, '_') : '');
+            const key = prefix + (req.query?.name ? req.query.name.replace(/ /g, '_') : '');
             const url = await awsService.getPutSignedUrl(bucketName, key);
             return res.status(200).send({ 
                 data: {
@@ -328,7 +326,6 @@ export default {
         try{
             const bucketName = process.env.AWS_BUCKET;
             const key = req.query.name;
-            console.log('-----------',bucketName,key)
             const url = await awsService.getSignedUrlDownload(bucketName, key);
             
             return res.json({
@@ -356,7 +353,6 @@ export default {
                 template_name: req.query.search
             };
             const categoryCondition = category_id ? `AND t.category_id = '${category_id}'` : '';
-            console.log('------1',offset, page, limit);
             const data = await template.ammar(searchCriteria, categoryCondition, options, offset);
             
             // Calculate next and previous page numbers
