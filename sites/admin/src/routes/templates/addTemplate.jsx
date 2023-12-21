@@ -51,7 +51,7 @@ const AddTemplate = () => {
   }, [])
 
   const handleFileUpload = async (event) => {
-    setProgress(1)
+    setProgress((prevProgress) => 1)
     try {
       setFile(event.target.files[0])
       const newFile = event.target.files[0]
@@ -63,9 +63,10 @@ const AddTemplate = () => {
         console.log('file size is smaller than 5 mb')
         const formData = new FormData()
         formData.append('name', newFile?.name)
+        console.log(newFile?.name)
         // upload to get signed URL
         const responseOne = await axiosInstance.get('template/getPutSignedUrl', formData)
-        setProgress(50)
+        setProgress((prevProgress) => 50)
         const signedUrl = responseOne?.data?.data?.url
         const key = responseOne?.data?.data?.key
 
@@ -80,7 +81,7 @@ const AddTemplate = () => {
             'Content-Type': newFile.type,
           },
         })
-        setProgress(99)
+        setProgress((prevProgress) => 100)
       }
 
       if (newFile?.size > 5242880) {
@@ -173,6 +174,7 @@ const AddTemplate = () => {
   }
 
   const handleAddTemplate = async () => {
+    console.log(progress)
     console.log('Adding template:', {
       templateName,
       templateDescription,
