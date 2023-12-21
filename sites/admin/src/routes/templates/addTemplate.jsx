@@ -65,10 +65,16 @@ const AddTemplate = () => {
         formData.append('name', newFile?.name)
         console.log(newFile?.name)
         // upload to get signed URL
-        const responseOne = await axiosInstance.get('template/getPutSignedUrl', formData)
+        const responseOne = await axiosInstance.get(
+          `template/getPutSignedUrl?type=get&name=${newFile?.name}`,
+        )
         setProgress((prevProgress) => 50)
         const signedUrl = responseOne?.data?.data?.url
+        const fileExtension = newFile?.name.slice(((newFile?.name.lastIndexOf('.') - 1) >>> 0) + 2)
+
+        // const key = responseOne?.data?.data?.key + '.' + fileExtension
         const key = responseOne?.data?.data?.key
+        console.log(fileExtension, key)
 
         setTemplateKey(key)
         setTemplateType(newFile?.type)
