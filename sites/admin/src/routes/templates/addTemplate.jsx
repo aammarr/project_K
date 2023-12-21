@@ -34,7 +34,6 @@ const AddTemplate = () => {
   const [file, setFile] = useState(null)
   const [loading, setLoading] = useState(false)
   const [progress, setProgress] = useState(0) // Progress state
-
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -52,20 +51,18 @@ const AddTemplate = () => {
   }, [])
 
   const handleFileUpload = async (event) => {
+    setProgress(1)
     try {
       setFile(event.target.files[0])
       const newFile = event.target.files[0]
 
-      setTemplateKey('')
-      setTemplateUrl('')
-      setTemplateType('')
-      setTemplateSize('')
+      console.log(newFile)
 
       if (newFile?.size < 5242880) {
         setProgress(20)
         console.log('file size is smaller than 5 mb')
         const formData = new FormData()
-        formData.append('key', newFile?.name)
+        formData.append('name', newFile?.name)
         // upload to get signed URL
         const responseOne = await axiosInstance.get('template/getPutSignedUrl', formData)
         setProgress(50)
@@ -83,7 +80,7 @@ const AddTemplate = () => {
             'Content-Type': newFile.type,
           },
         })
-        setProgress(100)
+        setProgress(99)
       }
 
       if (newFile?.size > 5242880) {
@@ -95,7 +92,7 @@ const AddTemplate = () => {
         const uploadedEtags = []
 
         const formData = new FormData()
-        formData.append('key', newFile?.name)
+        formData.append('name', newFile?.name)
 
         // upload to S3
         const responseOne = await axiosInstance.post('template/initiateUpload', formData)
@@ -121,7 +118,7 @@ const AddTemplate = () => {
             },
           })
           uploadedChunks++
-          setProgress(Math.floor((uploadedChunks / totalChunks) * 100))
+          setProgress((prevProgress) => Math.floor((uploadedChunks / totalChunks) * 100))
 
           uploadedEtags.push({
             PartNumber: partNumber,
@@ -130,7 +127,7 @@ const AddTemplate = () => {
           const sortedParts = uploadedEtags.sort((a, b) => a.PartNumber - b.PartNumber)
           console.log(sortedParts)
           console.log(progress)
-          if (progress === 100) {
+          if (uploadedChunks === totalChunks) {
             let completeUploadpPostData = {
               key: responseOneData?.Key,
               uploadId: responseOneData?.UploadId,
@@ -158,6 +155,7 @@ const AddTemplate = () => {
             }
           }
         }
+
         for (let i = 1; i <= totalChunks; i++) {
           const start = (i - 1) * chunkSize
           const end = Math.min(i * chunkSize, newFile?.size)
@@ -283,11 +281,16 @@ const AddTemplate = () => {
 
               {/* Display progress bar when file is being uploaded */}
               {progress > 0 && progress < 100 && (
-                <LinearProgress
-                  variant="determinate"
-                  value={progress}
-                  style={{ marginTop: '10px' }}
-                />
+                <>
+                  <LinearProgress
+                    variant="determinate"
+                    value={progress}
+                    style={{ marginTop: '10px' }}
+                  />
+                  <div
+                    style={{ textAlign: 'center', marginTop: '5px' }}
+                  >{`${progress}% Uploaded`}</div>
+                </>
               )}
 
               <CButton color="primary" onClick={handleAddTemplate} style={{ marginTop: '20px' }}>

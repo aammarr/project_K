@@ -27,8 +27,10 @@ import { toast } from 'react-toastify'
 import axiosInstance from 'src/axios/axiosConfig'
 import Pagination from '@mui/material/Pagination'
 import CIcon from '@coreui/icons-react'
-import { cilSearch } from '@coreui/icons'
-
+import { cilCloudDownload, cilSearch, cilTrash } from '@coreui/icons'
+import VisibilityIcon from '@mui/icons-material/Visibility'
+import CloudDownloadIcon from '@mui/icons-material/CloudDownload'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 const Templates = () => {
   const { page, limit, search } = useParams()
 
@@ -52,7 +54,7 @@ const Templates = () => {
     const responseOne = await axiosInstance.get(
       `template/getSignedUrlDownload?type=get&name=${key}`,
     )
-    console.log(responseOne)
+    window.open(responseOne?.data?.data, '_blank')
   }
 
   useEffect(() => {
@@ -76,7 +78,7 @@ const Templates = () => {
     fetchTemplates()
   }, [page, limit, search])
 
-  const handleUpdatetemplate = (templateId) => {
+  const handleUpdateTemplate = (templateId) => {
     navigate(`/templates/update/${templateId}`)
   }
 
@@ -97,7 +99,7 @@ const Templates = () => {
       toast.success('template deleted successfully')
       setCurrentPage(1)
 
-      navigate(`/categories/1/${limit}/${searchText ? searchText : ''}`)
+      navigate(`/templates/1/${limit}/${searchText ? searchText : ''}`)
     } catch (error) {
       console.error('Error deleting template:', error)
       toast.error('Error deleting template')
@@ -210,23 +212,24 @@ const Templates = () => {
                           <CTableDataCell>
                             {template?.template_key && (
                               <CButton
-                                color="info"
+                                color="success"
                                 onClick={() => handleDownloadTemplate(template.template_key)}
+                                style={{ marginRight: '5px' }}
                               >
-                                Download
+                                <CloudDownloadIcon style={{ color: 'white' }} />
                               </CButton>
                             )}
                             <CButton
                               color="info"
-                              onClick={() => handleUpdatetemplate(template.template_id)}
+                              onClick={() => handleUpdateTemplate(template.template_id)}
                             >
-                              Update
+                              <VisibilityIcon style={{ color: 'white' }} />
                             </CButton>{' '}
                             <CButton
                               color="danger"
                               onClick={() => handleDeleteTemplate(template.template_id)}
                             >
-                              Delete
+                              <DeleteOutlineIcon style={{ color: 'white' }} />
                             </CButton>
                           </CTableDataCell>
                         </CTableRow>
