@@ -321,7 +321,7 @@ const Dashboard = () => {
         </CCardFooter>
       </CCard>
 
-      <WidgetsBrand withCharts />
+      {/* <WidgetsBrand withCharts /> */}
 
       <CRow>
         <CCol xs>
@@ -412,7 +412,7 @@ const Dashboard = () => {
 
               <br />
 
-              <CTable align="middle" className="mb-0 border" hover responsive>
+              {/* <CTable align="middle" className="mb-0 border" hover responsive>
                 <CTableHead color="light">
                   <CTableRow>
                     <CTableHeaderCell className="text-center">
@@ -462,7 +462,7 @@ const Dashboard = () => {
                     </CTableRow>
                   ))}
                 </CTableBody>
-              </CTable>
+              </CTable> */}
             </CCardBody>
           </CCard>
         </CCol>
