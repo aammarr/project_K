@@ -2,11 +2,11 @@ import user from "../models/user.js";
 import Util from "../helper/util.js";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import template from "../models/template.js";
 
 export default {
   // 
   register: async (req, res) => {
-    console.log("register")
     try {
       // const { type } = req?.params =='user' ?2:'';
 
@@ -118,4 +118,50 @@ export default {
     return res.status(500).send({ status: false, message: 'Error updating user: ', error });
   }
   },
+
+  //
+  getAllUsers: async (req,res)=>{
+    try{
+      const { page = 1, limit = 25, search = ''} = req.query;
+      const tableName = 'users';
+      const options = {
+        page: parseInt(page, 10),
+        limit: parseInt(limit, 10),
+      };
+      const offset = (options.page - 1) * options.limit;
+      // Define the search criteria
+      const searchCriteria = {
+        template_name: req.query.search
+      };
+      let userCondition = '';
+      userCondition += search ? `OR u.first_name LIKE '%${searchCriteria.template_name}%'` : '';
+      userCondition += search ? `OR u.last_name LIKE '%${searchCriteria.template_name}%'` : '';
+
+      const userRecords = await user.findAllUsers(searchCriteria, userCondition, options, offset);
+      
+      // Calculate next and previous page numbers
+      const totalCount = await template.tableCount(tableName);
+      const totalPages = Math.ceil(totalCount[0].count / options.limit);
+      const nextPage = options.page < totalPages ? options.page + 1 : null;
+      const prevPage = options.page > 1 ? options.page - 1 : null;
+      console.log('----',totalPages,nextPage,prevPage);
+      if (!userRecords) { 
+        return res.status(200).send({status: true, data:[],message: 'No User Found.',
+        });
+      }
+      else{
+        console.log(userRecords.length);
+        return res.status(200).send({status: true, data:userRecords, 
+          pagination:{
+            totalResults:totalCount[0].count,
+            totalPages:totalPages,
+            nextPage:nextPage,
+            prevPage:prevPage,
+          },
+          message: 'User fetched successfully.'});
+      }
+    } catch (error) {
+      res.status(500).send({ status: false, message: 'Internal server error: ', error });
+    }
+  }
 };

@@ -45,4 +45,13 @@ export default {
     const [rows] = await db.query(sql, params);
     return rows;
   },
+
+  //
+  findAllUsers:async (searchCriteria, userCondition, options, offset)=>{
+    const sql = `SELECT u.* FROM users as u
+      WHERE u.role_id != 1 ${userCondition}
+      Limit ${options.limit} offset ${offset}`;
+    const rows = await db.query(sql);
+    return rows;
+  }
 };

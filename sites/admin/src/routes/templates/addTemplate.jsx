@@ -63,23 +63,27 @@ const AddTemplate = () => {
         console.log('file size is smaller than 5 mb')
         const formData = new FormData()
         formData.append('name', newFile?.name)
-        console.log(newFile?.name)
+
+        const fileName = newFile?.name.replace(/ /g,"_")
+
         // upload to get signed URL
         const responseOne = await axiosInstance.get(
-          `template/getPutSignedUrl?type=get&name=${newFile?.name}`,
+          `template/getPutSignedUrl?type=get&name=${fileName}`,
         )
         setProgress((prevProgress) => 50)
         const signedUrl = responseOne?.data?.data?.url
-        const fileExtension = newFile?.name.slice(((newFile?.name.lastIndexOf('.') - 1) >>> 0) + 2)
+        // const fileExtension = newFile?.name.slice(((newFile?.name.lastIndexOf('.') - 1) >>> 0) + 2)
+        const fileExtension = newFile.type
 
         // const key = responseOne?.data?.data?.key + '.' + fileExtension
-        const key = responseOne?.data?.data?.key
+        const key = responseOne?.data?.data?.key;
+        const url = responseOne?.data?.data?.url;
         console.log(fileExtension, key)
 
         setTemplateKey(key)
         setTemplateType(newFile?.type)
         setTemplateSize(newFile?.size)
-        setTemplateUrl(key)
+        setTemplateUrl(url)
 
         // upload to API
         await axios.put(signedUrl, key, newFile, {
