@@ -327,12 +327,13 @@ export default {
     getDownloadUrl: async(req,res,next)=>{
         try{
             const bucketName = process.env.AWS_BUCKET;
-            const key = req.query.key;
+            const key = req.query.name;
+            console.log('-----------',bucketName,key)
             const url = await awsService.getSignedUrlDownload(bucketName, key);
             
             return res.json({
                 data: url,
-                message: 'Url fetched successfuly.'
+                message: 'Download Url fetched successfuly.'
             });
         }
         catch(err){
