@@ -31,7 +31,7 @@ export default {
       sql += ` ${fields[i]} = '${userData[fields[i]]}',`;
     }
     sql = sql.slice(0, -1); 
-    sql += ` WHERE id = ${id}`;
+    sql += ` WHERE user_id = ${id}`;
     return await db.query(sql);
   },
 

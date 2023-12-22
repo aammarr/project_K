@@ -74,7 +74,6 @@ export default {
    */
   getUser: async (req, res) => {
     try {
-        
         const userId = req.user.userId;
         const userRecord = await user.findById(userId);
         if (!userRecord) {
@@ -100,19 +99,13 @@ export default {
       const userRecord = await user.findById(userId);
       delete userRecord.password;
       delete userRecord.otp;
-      let tokenObj = { 
-        userId: userRecord.user_id,
-        role_id: userRecord.role_id 
-      };
-      updateObj = Object.assign({user_id: userId}, updateObj);
-      console.log(updateObj)
-    
-      const token = jwt.sign(
-        tokenObj,
-        Util("JWT_KEY", "unsecureKey"),
-      );
-      
-    return res.status(200).send({ status: true, message: 'User data' , data : {token}});
+
+      updateObj = await user.updateById(userRecord.user_id, updateObj);
+      if(updateObj.affectedRows>0){
+        updateObj = await user.findById(userId);
+      }
+
+    return res.status(200).send({ status: true, data : updateObj,message: 'User updated successfully.'});
   } catch (error) {
     console.error(error);
     return res.status(500).send({ status: false, message: 'Error updating user: ', error });
