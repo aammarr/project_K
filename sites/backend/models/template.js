@@ -44,6 +44,7 @@ export default {
         const rows = await db.query(sql);
         return rows;
     },
+
     // 
     createTemplate: async (dataObj) => {
         const fields = Object.keys(dataObj);
@@ -94,6 +95,37 @@ export default {
         const sql = `SELECT count(*) as  count FROM ${tableName}`;
         const rows = await db.query(sql);
         return rows;
+    },
+
+    //
+    getTotalTemplatesDownloadCount: async()=>{
+        const sql = `SELECT SUM(template_download_count) as count FROM templates`;
+        const rows = await db.query(sql);
+        return rows;
+    },
+
+    //
+    getTemplateByKey:async (key)=>{
+        const sql = `SELECT t.*, c.category_name FROM templates as t
+        left join categories as c
+        on t.category_id = c.category_id 
+        WHERE t.template_key = '${key}'`;
+        const [rows] = await db.query(sql);
+
+        return rows;
+    },
+
+    //
+    updateTemplateDownloadCount:async (key,data)=>{
+        let sql = 'UPDATE templates SET';
+        const fields = Object.keys(data);
+        for (let i = 0; i < fields.length; i++) {
+        sql += ` ${fields[i]} = '${data[fields[i]]}',`;
+        }
+        sql = sql.slice(0, -1); 
+        sql += ` WHERE template_key = '${key}'`;
+
+        return await db.query(sql);
     },
 
     //

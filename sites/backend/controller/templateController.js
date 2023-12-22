@@ -327,7 +327,11 @@ export default {
             const bucketName = process.env.AWS_BUCKET;
             const key = req.query.name;
             const url = await awsService.getSignedUrlDownload(bucketName, key);
+            const fetchedTemplate = await template.getTemplateByKey(key);
             
+            let newCount = fetchedTemplate.template_download_count+1;
+            await template.updateTemplateDownloadCount(key,{"template_download_count":newCount});
+
             return res.json({
                 data: url,
                 message: 'Download Url fetched successfuly.'

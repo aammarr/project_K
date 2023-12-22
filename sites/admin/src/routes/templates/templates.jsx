@@ -54,7 +54,7 @@ const Templates = () => {
     const responseOne = await axiosInstance.get(
       `template/getSignedUrlDownload?type=get&name=${key}`,
     )
-    window.open(responseOne?.data?.data, '_blank')
+    window.open(responseOne?.data?.data, '_blank');
   }
 
   useEffect(() => {

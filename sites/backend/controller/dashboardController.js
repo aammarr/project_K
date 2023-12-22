@@ -12,11 +12,13 @@ export default {
             const usersCount = await template.tableCount(usersTable);
             const categoriesCount = await template.tableCount(categoriesTable);
             const templatesCount = await template.tableCount(templatesTable);
- 
+            const totalTemplatesDownloadCount = await template.getTotalTemplatesDownloadCount(templatesTable);
+
             let response = {};
             response.users=usersCount[0].count;
             response.categories=categoriesCount[0].count;
             response.templates=templatesCount[0].count;
+            response.totalTemplatesDownloadCount=parseInt(totalTemplatesDownloadCount[0].count,10);
             
             console.log(response);
 
