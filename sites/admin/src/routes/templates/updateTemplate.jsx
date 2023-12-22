@@ -51,28 +51,26 @@ const UpdateTemplate = () => {
 
     fetchCategories()
   }, [])
+  const fetchData = async () => {
+    try {
+      // Fetch template data using the provided template ID
+      const response = await axiosInstance.get(`template/${id}`)
+      const templateData = response?.data?.data
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Fetch template data using the provided template ID
-        const response = await axiosInstance.get(`template/${id}`)
-        const templateData = response?.data?.data
-
-        // Set the form fields with the retrieved data
-        setTemplateName(templateData.template_name)
-        setTemplateDescription(templateData.template_description)
-        setTemplateCode(templateData.template_code)
-        setCategoryId(templateData.category_id)
-        setTemplateKey(templateData.template_key)
-        setTemplateDownloadCount(templateData.template_download_count)
-        setTemplateViewCount(templateData.template_view_count)
-      } catch (error) {
-        console.error('Error fetching template data:', error)
-        toast.error('Error fetching template data')
-      }
+      // Set the form fields with the retrieved data
+      setTemplateName(templateData.template_name)
+      setTemplateDescription(templateData.template_description)
+      setTemplateCode(templateData.template_code)
+      setCategoryId(templateData.category_id)
+      setTemplateKey(templateData.template_key)
+      setTemplateDownloadCount(templateData.template_download_count)
+      setTemplateViewCount(templateData.template_view_count)
+    } catch (error) {
+      console.error('Error fetching template data:', error)
+      toast.error('Error fetching template data')
     }
-
+  }
+  useEffect(() => {
     fetchData()
   }, [id])
 
@@ -137,6 +135,7 @@ const UpdateTemplate = () => {
       `template/getSignedUrlDownload?type=get&name=${templateKey}`,
     )
     window.open(responseOne?.data?.data, '_blank')
+    fetchData()
   }
 
   const buttonText = editable ? 'Update Template' : `Template Name: ${templateName}`

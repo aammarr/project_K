@@ -55,26 +55,25 @@ const Templates = () => {
       `template/getSignedUrlDownload?type=get&name=${key}`,
     )
     window.open(responseOne?.data?.data, '_blank')
+    fetchTemplates()
   }
-
-  useEffect(() => {
-    const fetchTemplates = async () => {
-      try {
-        setLoading(true) // Set loading to true before making the API call
-        const response = await axiosInstance.get(
-          `template?page=${page}&limit=${limit}&search=${search ? search : ''}`,
-        )
-        settemplates(response?.data?.data)
-        setTotalPages(response?.data?.pagination?.totalPages)
-        setTotalItems(response?.data?.pagination?.totalResults)
-      } catch (error) {
-        console.error('Error fetching templates:', error)
-        toast.error('Error fetching templates')
-      } finally {
-        setLoading(false) // Set loading to false after the API call is complete
-      }
+  const fetchTemplates = async () => {
+    try {
+      setLoading(true) // Set loading to true before making the API call
+      const response = await axiosInstance.get(
+        `template?page=${page}&limit=${limit}&search=${search ? search : ''}`,
+      )
+      settemplates(response?.data?.data)
+      setTotalPages(response?.data?.pagination?.totalPages)
+      setTotalItems(response?.data?.pagination?.totalResults)
+    } catch (error) {
+      console.error('Error fetching templates:', error)
+      toast.error('Error fetching templates')
+    } finally {
+      setLoading(false) // Set loading to false after the API call is complete
     }
-
+  }
+  useEffect(() => {
     fetchTemplates()
   }, [page, limit, search])
 
