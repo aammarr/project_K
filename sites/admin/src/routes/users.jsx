@@ -146,7 +146,6 @@ const Users = () => {
                         <CTableHeaderCell>Email</CTableHeaderCell>
                         <CTableHeaderCell>Phone</CTableHeaderCell>
                         <CTableHeaderCell>City</CTableHeaderCell>
-
                         <CTableHeaderCell>Country</CTableHeaderCell>
                       </CTableRow>
                     </CTableHead>

@@ -190,10 +190,11 @@ const Templates = () => {
                       <CTableRow>
                         <CTableHeaderCell>Template ID</CTableHeaderCell>
                         <CTableHeaderCell>Template Name</CTableHeaderCell>
-                        <CTableHeaderCell>Category Name</CTableHeaderCell>
-                        <CTableHeaderCell>Template Description</CTableHeaderCell>
                         <CTableHeaderCell>Template Code</CTableHeaderCell>
+
+                        <CTableHeaderCell>Category Name</CTableHeaderCell>
                         <CTableHeaderCell>Views</CTableHeaderCell>
+                        <CTableHeaderCell>Downloads</CTableHeaderCell>
 
                         <CTableHeaderCell>Actions</CTableHeaderCell>
                       </CTableRow>
@@ -203,11 +204,11 @@ const Templates = () => {
                         <CTableRow key={template.template_id}>
                           <CTableDataCell>{template.template_id}</CTableDataCell>
                           <CTableDataCell>{template.template_name}</CTableDataCell>
-                          <CTableDataCell>{template.category_name}</CTableDataCell>
-
-                          <CTableDataCell>{template.template_description}</CTableDataCell>
                           <CTableDataCell>{template.template_code}</CTableDataCell>
+
+                          <CTableDataCell>{template.category_name}</CTableDataCell>
                           <CTableDataCell>{template.template_view_count}</CTableDataCell>
+                          <CTableDataCell>{template.template_download_count}</CTableDataCell>
 
                           <CTableDataCell>
                             {template?.template_key && (

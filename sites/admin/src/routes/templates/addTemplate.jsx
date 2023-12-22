@@ -58,7 +58,8 @@ const AddTemplate = () => {
 
       console.log(newFile)
 
-      if (newFile?.size < 5242880) {
+      // file size is smaller than 5 Mb
+      if (newFile?.size < 4999999) {
         setProgress(20)
         console.log('file size is smaller than 5 mb')
         const formData = new FormData()
@@ -78,23 +79,31 @@ const AddTemplate = () => {
         // const key = responseOne?.data?.data?.key + '.' + fileExtension
         const key = responseOne?.data?.data?.key;
         const url = responseOne?.data?.data?.url;
-        console.log(fileExtension, key)
-
+        console.log('responseOne : ', responseOne.data);
+ 
         setTemplateKey(key)
         setTemplateType(newFile?.type)
         setTemplateSize(newFile?.size)
         setTemplateUrl(url)
 
         // upload to API
-        await axios.put(signedUrl, key, newFile, {
+        await axios.put(signedUrl, newFile, {
           headers: {
             'Content-Type': newFile.type,
           },
         })
-        setProgress((prevProgress) => 100)
+        .then(response => {
+          if(response.status == 200){
+              setProgress((prevProgress) => 100);
+          }
+        })
+        .catch(error => {
+          console.log('Upload error:', error);
+        });
       }
 
-      if (newFile?.size > 5242880) {
+      // file is bigger than 5 mb
+      if (newFile?.size > 4999999) {
         console.log('file is bigger than 5 mb')
 
         const chunkSize = 5 * 1024 * 1024
