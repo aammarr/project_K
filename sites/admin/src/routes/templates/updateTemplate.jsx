@@ -51,6 +51,7 @@ const UpdateTemplate = () => {
 
     fetchCategories()
   }, [])
+
   const fetchData = async () => {
     try {
       // Fetch template data using the provided template ID
@@ -70,6 +71,7 @@ const UpdateTemplate = () => {
       toast.error('Error fetching template data')
     }
   }
+
   useEffect(() => {
     fetchData()
   }, [id])
@@ -116,11 +118,6 @@ const UpdateTemplate = () => {
 
   const handleCancel = () => {
     // Reset form fields and exit edit mode
-    setTemplateName('')
-    setTemplateDescription('')
-    setTemplateCode('')
-    setCategoryId('')
-    setFile(null)
     setEditable(false)
     setEditIconVisible(true)
   }
@@ -207,6 +204,8 @@ const UpdateTemplate = () => {
                     onChange={(e) => setFile(e.target.files[0])}
                     disabled={!editable} // Set the "disabled" attribute based on the "editable" state
                   />
+                  {/* Display the file name when a file is selected, otherwise show "No file chosen" */}
+                  {!file && <p>{file ? `Selected File: ${file.name}` : templateKey}</p>}
                 </>
               )}
 
