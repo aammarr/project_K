@@ -151,34 +151,35 @@ const Users = () => {
                       </CTableRow>
                     </CTableHead>
                     <CTableBody>
-                      {users.map((user) => (
-                        <CTableRow key={user.user_id}>
-                          <CTableDataCell className="text-center">
-                            {user?.avatar ? (
-                              <CAvatar size="md" src={user.avatar} />
-                            ) : (
-                              <CAvatar size="md" src={avatar9} />
-                            )}
-                          </CTableDataCell>
-                          <CTableDataCell>
-                            <div>{`${user.first_name} ${user.last_name}`}</div>
-                            <div className="small text-medium-emphasis">
-                              {/* <span>{user.user.new ? 'New' : 'Recurring'}</span> | Registered:{' '} */}
-                              {/* {user.user.registered} */}
-                            </div>
-                          </CTableDataCell>
-                          <CTableDataCell>{user.email}</CTableDataCell>{' '}
-                          <CTableDataCell>{user.phone}</CTableDataCell>
-                          <CTableDataCell>
-                            {/* <CIcon size="xl" icon={user.country} title={user.country} /> */}
-                            {user.city}
-                          </CTableDataCell>
-                          <CTableDataCell>
-                            {/* <CIcon size="xl" icon={user.country} title={user.country} /> */}
-                            {user.country}
-                          </CTableDataCell>
-                        </CTableRow>
-                      ))}
+                      {users?.length !== 0 &&
+                        users.map((user) => (
+                          <CTableRow key={user.user_id}>
+                            <CTableDataCell className="text-center">
+                              {user?.avatar ? (
+                                <CAvatar size="md" src={user.avatar} />
+                              ) : (
+                                <CAvatar size="md" src={avatar9} />
+                              )}
+                            </CTableDataCell>
+                            <CTableDataCell>
+                              <div>{`${user.first_name} ${user.last_name}`}</div>
+                              <div className="small text-medium-emphasis">
+                                {/* <span>{user.user.new ? 'New' : 'Recurring'}</span> | Registered:{' '} */}
+                                {/* {user.user.registered} */}
+                              </div>
+                            </CTableDataCell>
+                            <CTableDataCell>{user.email}</CTableDataCell>{' '}
+                            <CTableDataCell>{user.phone}</CTableDataCell>
+                            <CTableDataCell>
+                              {/* <CIcon size="xl" icon={user.country} title={user.country} /> */}
+                              {user.city}
+                            </CTableDataCell>
+                            <CTableDataCell>
+                              {/* <CIcon size="xl" icon={user.country} title={user.country} /> */}
+                              {user.country}
+                            </CTableDataCell>
+                          </CTableRow>
+                        ))}
                     </CTableBody>
                   </CTable>
                   <br />
