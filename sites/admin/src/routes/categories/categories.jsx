@@ -28,6 +28,8 @@ import axiosInstance from 'src/axios/axiosConfig'
 import Pagination from '@mui/material/Pagination'
 import CIcon from '@coreui/icons-react'
 import { cilSearch } from '@coreui/icons' // Import search icon
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
+import ModeEditIcon from '@mui/icons-material/ModeEdit'
 
 const Categories = () => {
   const { page, limit, search } = useParams()
@@ -196,18 +198,15 @@ const Categories = () => {
                           <CTableDataCell>{category.category_description}</CTableDataCell>
                           <CTableDataCell>{category.category_code}</CTableDataCell>
                           <CTableDataCell>
-                            <CButton
-                              color="info"
+                            <ModeEditIcon
+                              style={{ marginRight: '10px', cursor: 'pointer' }}
                               onClick={() => handleUpdateCategory(category.category_id)}
-                            >
-                              Update
-                            </CButton>{' '}
-                            <CButton
-                              color="danger"
+                            />
+
+                            <DeleteOutlineIcon
+                              style={{ marginRight: '10px', cursor: 'pointer' }}
                               onClick={() => handleDeleteCategory(category.category_id)}
-                            >
-                              Delete
-                            </CButton>
+                            />
                           </CTableDataCell>
                         </CTableRow>
                       ))}

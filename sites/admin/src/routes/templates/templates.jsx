@@ -211,26 +211,21 @@ const Templates = () => {
 
                           <CTableDataCell>
                             {template?.template_key && (
-                              <CButton
-                                color="success"
+                              <CloudDownloadIcon
+                                style={{ marginRight: '10px', cursor: 'pointer' }}
                                 onClick={() => handleDownloadTemplate(template.template_key)}
-                                style={{ marginRight: '5px' }}
-                              >
-                                <CloudDownloadIcon style={{ color: 'white' }} />
-                              </CButton>
+                              />
                             )}
-                            <CButton
-                              color="info"
+
+                            <VisibilityIcon
+                              style={{ marginRight: '10px', cursor: 'pointer' }}
                               onClick={() => handleUpdateTemplate(template.template_id)}
-                            >
-                              <VisibilityIcon style={{ color: 'white' }} />
-                            </CButton>{' '}
-                            <CButton
-                              color="danger"
+                            />
+
+                            <DeleteOutlineIcon
+                              style={{ marginRight: '10px', cursor: 'pointer' }}
                               onClick={() => handleDeleteTemplate(template.template_id)}
-                            >
-                              <DeleteOutlineIcon style={{ color: 'white' }} />
-                            </CButton>
+                            />
                           </CTableDataCell>
                         </CTableRow>
                       ))}
