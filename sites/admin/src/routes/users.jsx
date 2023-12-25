@@ -28,48 +28,48 @@ import Pagination from '@mui/material/Pagination'
 import avatar9 from './../assets/images/avatars/8.jpg'
 
 const Users = () => {
-  const { page, limit, search } = useParams()
-
   const navigate = useNavigate()
   const [users, setUsers] = useState([])
   const [loading, setLoading] = useState(true)
-  const [currentPage, setCurrentPage] = useState(parseInt(page))
+  const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(0)
   const [totalItems, setTotalItems] = useState(0)
+  const [limit, setLimit] = useState(25)
 
-  const [searchText, setSearchText] = useState(search)
+  const [searchText, setSearchText] = useState('')
 
   // const handleButtonClick = () => {
   //   navigate('/users/add')
   // }
+  const fetchUsers = async () => {
+    try {
+      setLoading(true)
+      const response = await axiosInstance.get(
+        `user/?page=${currentPage}&limit=${limit}&search=${searchText ? searchText : ''}`,
+      )
+      setUsers(response?.data?.data)
+      setTotalPages(response?.data?.pagination?.totalPages)
+      setTotalItems(response?.data?.pagination?.totalResults)
+    } catch (error) {
+      console.error('Error fetching users:', error)
+      toast.error('Error fetching users')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        setLoading(true)
-        const response = await axiosInstance.get(
-          `user/?page=${page}&limit=${limit}&search=${search ? search : ''}`,
-        )
-        setUsers(response?.data?.data)
-        setTotalPages(response?.data?.pagination?.totalPages)
-        setTotalItems(response?.data?.pagination?.totalResults)
-      } catch (error) {
-        console.error('Error fetching users:', error)
-        toast.error('Error fetching users')
-      } finally {
-        setLoading(false)
-      }
-    }
-
     fetchUsers()
-  }, [page, limit, search])
+  }, [currentPage, limit])
 
   const handlePageChange = (event, page) => {
-    navigate(`/users/${page}/${limit}/${searchText ? searchText : ''}`)
+    setCurrentPage(page)
   }
 
   const handleSearch = () => {
-    window.location = `/users/1/${limit}/${searchText}`
+    setCurrentPage(1)
+
+    fetchUsers()
   }
 
   const handleInputChange = (event) => {
@@ -78,7 +78,8 @@ const Users = () => {
 
   const handleKeyPress = (event) => {
     if (event.key === 'Enter') {
-      handleSearch()
+      setCurrentPage(1)
+      fetchUsers()
     }
   }
 
