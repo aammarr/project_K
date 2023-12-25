@@ -1,6 +1,5 @@
 /* eslint-disable prettier/prettier */
 import React, { useState, useEffect } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
 import {
   CButton,
   CCard,
@@ -27,50 +26,49 @@ import { toast } from 'react-toastify'
 import axiosInstance from 'src/axios/axiosConfig'
 import Pagination from '@mui/material/Pagination'
 import CIcon from '@coreui/icons-react'
-import { cilSearch } from '@coreui/icons' // Import search icon
+import { cilSearch } from '@coreui/icons'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
 import ModeEditIcon from '@mui/icons-material/ModeEdit'
+import { useNavigate } from 'react-router-dom'
 
 const Categories = () => {
-  const { page, limit, search } = useParams()
-
   const navigate = useNavigate()
   const [categories, setCategories] = useState([])
   const [selectedCategoryId, setSelectedCategoryId] = useState(null)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [currentPage, setCurrentPage] = useState(parseInt(page))
+  const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(0)
   const [totalItems, setTotalItems] = useState(0)
-  const itemsPerPage = 25 // Adjust the number of items per page as needed
+  const [searchText, setSearchText] = useState('')
+  const [limit, setLimit] = useState(25)
 
-  const [searchText, setSearchText] = useState(search)
-
-  console.log(page, limit, search)
   const handleButtonClick = () => {
     navigate('/categories/add')
   }
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        setLoading(true) // Set loading to true before making the API call
-        const response = await axiosInstance.get(
-          `category?page=${page}&limit=${limit}&search=${search ? search : ''}`,
-        )
-        setCategories(response?.data?.data)
-        setTotalPages(response?.data?.pagination?.totalPages)
-        setTotalItems(response?.data?.pagination?.totalResults)
-      } catch (error) {
-        console.error('Error fetching categories:', error)
-        toast.error('Error fetching categories')
-      } finally {
-        setLoading(false) // Set loading to false after the API call is complete
-      }
+  const fetchCategories = async () => {
+    try {
+      setLoading(true)
+      const response = await axiosInstance.get(
+        `category?page=${currentPage}&limit=${limit}&search=${searchText ? searchText : ''}`,
+      )
+      setCategories(response?.data?.data)
+      setTotalPages(response?.data?.pagination?.totalPages)
+      setTotalItems(response?.data?.pagination?.totalResults)
+    } catch (error) {
+      console.error('Error fetching categories:', error)
+      toast.error('Error fetching categories')
+    } finally {
+      setLoading(false)
     }
+  }
 
+  useEffect(() => {
     fetchCategories()
-  }, [page, limit, search])
+    console.log('use effect triggered')
+    console.log(currentPage)
+  }, [currentPage, limit])
 
   const handleUpdateCategory = (categoryId) => {
     navigate(`/categories/update/${categoryId}`)
@@ -84,16 +82,13 @@ const Categories = () => {
   const handleDeleteConfirmation = async () => {
     try {
       await axiosInstance.delete(`category/${selectedCategoryId}`)
-      // After deletion, re-fetch data for the current page
       const response = await axiosInstance.get(
-        `category?page=${page}&limit=${limit}&search=${searchText ? searchText : ''}`,
+        `category?page=${currentPage}&limit=10&search=${searchText}`,
       )
       setCategories(response?.data?.data)
       setShowDeleteModal(false)
       toast.success('Category deleted successfully')
       setCurrentPage(1)
-
-      navigate(`/categories/1/${limit}/${searchText ? searchText : ''}`)
     } catch (error) {
       console.error('Error deleting category:', error)
       toast.error('Error deleting category')
@@ -105,15 +100,14 @@ const Categories = () => {
   }
 
   const handlePageChange = (event, page) => {
-    // Update the current page when the page changes
-    console.log(page)
-    navigate(`/categories/${page}/${limit}/${searchText ? searchText : ''}`)
+    setCurrentPage(page)
   }
 
-  const handleSearch = () => {
-    // Your search logic here
-    console.log('Search:', searchText)
-    window.location = `/categories/1/${limit}/${searchText}`
+  const handleSearch = async () => {
+    setCurrentPage(1)
+    if (currentPage === 1) {
+      fetchCategories()
+    }
   }
 
   const handleInputChange = (event) => {
@@ -121,9 +115,11 @@ const Categories = () => {
   }
 
   const handleKeyPress = (event) => {
-    // Check if the pressed key is the "Enter" key (key code 13)
     if (event.key === 'Enter') {
-      handleSearch()
+      setCurrentPage(1)
+      if (currentPage === 1) {
+        fetchCategories()
+      }
     }
   }
 
@@ -202,7 +198,6 @@ const Categories = () => {
                               style={{ marginRight: '10px', cursor: 'pointer' }}
                               onClick={() => handleUpdateCategory(category.category_id)}
                             />
-
                             <DeleteOutlineIcon
                               style={{ marginRight: '10px', cursor: 'pointer' }}
                               onClick={() => handleDeleteCategory(category.category_id)}
@@ -223,7 +218,7 @@ const Categories = () => {
                   count={totalPages}
                   color="primary"
                   onChange={handlePageChange}
-                  defaultPage={currentPage}
+                  page={currentPage}
                 />
               </div>
             </CCardBody>

@@ -69,7 +69,9 @@ const Users = () => {
   const handleSearch = () => {
     setCurrentPage(1)
 
-    fetchUsers()
+    if (currentPage === 1) {
+      fetchUsers()
+    }
   }
 
   const handleInputChange = (event) => {
@@ -79,7 +81,9 @@ const Users = () => {
   const handleKeyPress = (event) => {
     if (event.key === 'Enter') {
       setCurrentPage(1)
-      fetchUsers()
+      if (currentPage === 1) {
+        fetchUsers()
+      }
     }
   }
 
@@ -192,7 +196,7 @@ const Users = () => {
                   count={totalPages}
                   color="primary"
                   onChange={handlePageChange}
-                  defaultPage={currentPage}
+                  page={currentPage}
                 />
               </div>
             </CCardBody>

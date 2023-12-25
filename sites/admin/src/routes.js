@@ -62,12 +62,12 @@ const routes = [
   { path: '/dashboard', name: 'Dashboard', element: Dashboard },
   { path: '/users', name: 'Users', element: Users },
   {
-    path: '/categories/:page/:limit/:search?',
+    path: '/categories',
     name: 'Categories',
     element: Categories,
   },
   {
-    path: '/templates/:page/:limit/:search?',
+    path: '/templates',
     name: 'Templates',
     element: Templates,
   },
