@@ -14,13 +14,14 @@ import {
   CSpinner,
 } from '@coreui/react'
 import axiosInstance from '../../axios/axiosConfig'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useLocation } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
 const UpdateCategory = () => {
   const navigate = useNavigate()
-  const { id } = useParams()
+  const location = useLocation()
+  const id = location.state?.categoryId
 
   const [categoryName, setCategoryName] = useState('')
   const [categoryDescription, setCategoryDescription] = useState('')

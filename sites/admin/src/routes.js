@@ -72,7 +72,7 @@ const routes = [
     element: Templates,
   },
   { path: '/categories/add', name: 'Add Category', element: AddCategory },
-  { path: '/categories/update/:id', name: 'Update Category', element: UpdateCategory },
+  { path: '/categories/update', name: 'Update Category', element: UpdateCategory },
 
   { path: '/templates/add', name: 'Add Template', element: addTemplate },
   { path: '/templates/update/:id', name: 'Update Template', element: UpdateTemplate },
