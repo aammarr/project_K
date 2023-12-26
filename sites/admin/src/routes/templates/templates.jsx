@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import React, { useState, useEffect } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import {
   CButton,
   CCard,
@@ -31,19 +31,18 @@ import { cilCloudDownload, cilSearch, cilTrash } from '@coreui/icons'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline'
-const Templates = () => {
-  const { page, limit, search } = useParams()
 
+const Templates = () => {
   const navigate = useNavigate()
-  const [templates, settemplates] = useState([])
+  const [templates, setTemplates] = useState([])
   const [selectedTemplateId, setSelectedTemplateId] = useState(null)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [currentPage, setCurrentPage] = useState(parseInt(page))
+  const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(0)
   const [totalItems, setTotalItems] = useState(0)
-  const itemsPerPage = 25
-  const [searchText, setSearchText] = useState(search)
+  const [limit, setLimit] = useState(25)
+  const [searchText, setSearchText] = useState('')
 
   const handleButtonClick = () => {
     navigate('/templates/add')
@@ -57,28 +56,30 @@ const Templates = () => {
     window.open(responseOne?.data?.data, '_blank')
     fetchTemplates()
   }
+
   const fetchTemplates = async () => {
     try {
-      setLoading(true) // Set loading to true before making the API call
+      setLoading(true)
       const response = await axiosInstance.get(
-        `template?page=${page}&limit=${limit}&search=${search ? search : ''}`,
+        `template?page=${currentPage}&limit=${limit}&search=${searchText ? searchText : ''}`,
       )
-      settemplates(response?.data?.data)
+      setTemplates(response?.data?.data)
       setTotalPages(response?.data?.pagination?.totalPages)
       setTotalItems(response?.data?.pagination?.totalResults)
     } catch (error) {
       console.error('Error fetching templates:', error)
       toast.error('Error fetching templates')
     } finally {
-      setLoading(false) // Set loading to false after the API call is complete
+      setLoading(false)
     }
   }
+
   useEffect(() => {
     fetchTemplates()
-  }, [page, limit, search])
+  }, [currentPage, limit])
 
   const handleUpdateTemplate = (templateId) => {
-    navigate(`/templates/update/${templateId}`)
+    navigate('/templates/update', { state: { templateId } })
   }
 
   const handleDeleteTemplate = (templateId) => {
@@ -89,16 +90,13 @@ const Templates = () => {
   const handleDeleteConfirmation = async () => {
     try {
       await axiosInstance.delete(`template/${selectedTemplateId}`)
-      // After deletion, re-fetch data for the current page
       const response = await axiosInstance.get(
-        `template?page=${page}&limit=${limit}&search=${search ? search : ''}`,
+        `template?page=${currentPage}&limit=${limit}&search=${searchText ? searchText : ''}`,
       )
-      settemplates(response?.data?.data)
+      setTemplates(response?.data?.data)
       setShowDeleteModal(false)
-      toast.success('template deleted successfully')
+      toast.success('Template deleted successfully')
       setCurrentPage(1)
-
-      navigate(`/templates/1/${limit}/${searchText ? searchText : ''}`)
     } catch (error) {
       console.error('Error deleting template:', error)
       toast.error('Error deleting template')
@@ -110,14 +108,12 @@ const Templates = () => {
   }
 
   const handlePageChange = (event, page) => {
-    // Update the current page when the page changes
-    navigate(`/templates/${page}/${limit}/${searchText ? searchText : ''}`)
+    setCurrentPage(page)
   }
 
   const handleSearch = () => {
-    // Your search logic here
-    console.log('Search:', searchText)
-    window.location = `/templates/1/${limit}/${searchText}`
+    setCurrentPage(1)
+    if (currentPage === 1) fetchTemplates()
   }
 
   const handleInputChange = (event) => {
@@ -125,9 +121,9 @@ const Templates = () => {
   }
 
   const handleKeyPress = (event) => {
-    // Check if the pressed key is the "Enter" key (key code 13)
     if (event.key === 'Enter') {
-      handleSearch()
+      setCurrentPage(1)
+      if (currentPage === 1) fetchTemplates()
     }
   }
 
@@ -141,11 +137,7 @@ const Templates = () => {
                 style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
               >
                 <div
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                  }}
+                  style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
                 >
                   <div style={{ marginRight: '40px' }}>Templates</div>
                   <div>
@@ -169,10 +161,10 @@ const Templates = () => {
                       </CButton>
                     </CInputGroup>
                   </div>
-                </div>{' '}
+                </div>
                 <div className="ml-auto">
                   <CButton color="primary" onClick={handleButtonClick}>
-                    Add New template
+                    Add New Template
                   </CButton>
                 </div>
               </div>
@@ -190,11 +182,9 @@ const Templates = () => {
                         <CTableHeaderCell>Template ID</CTableHeaderCell>
                         <CTableHeaderCell>Template Name</CTableHeaderCell>
                         <CTableHeaderCell>Template Code</CTableHeaderCell>
-
                         <CTableHeaderCell>Category Name</CTableHeaderCell>
                         <CTableHeaderCell>Views</CTableHeaderCell>
                         <CTableHeaderCell>Downloads</CTableHeaderCell>
-
                         <CTableHeaderCell>Actions</CTableHeaderCell>
                       </CTableRow>
                     </CTableHead>
@@ -204,11 +194,9 @@ const Templates = () => {
                           <CTableDataCell>{template.template_id}</CTableDataCell>
                           <CTableDataCell>{template.template_name}</CTableDataCell>
                           <CTableDataCell>{template.template_code}</CTableDataCell>
-
                           <CTableDataCell>{template.category_name}</CTableDataCell>
                           <CTableDataCell>{template.template_view_count}</CTableDataCell>
                           <CTableDataCell>{template.template_download_count}</CTableDataCell>
-
                           <CTableDataCell>
                             {template?.template_key && (
                               <CloudDownloadIcon
@@ -216,12 +204,10 @@ const Templates = () => {
                                 onClick={() => handleDownloadTemplate(template.template_key)}
                               />
                             )}
-
                             <VisibilityIcon
                               style={{ marginRight: '10px', cursor: 'pointer' }}
                               onClick={() => handleUpdateTemplate(template.template_id)}
                             />
-
                             <DeleteOutlineIcon
                               style={{ marginRight: '10px', cursor: 'pointer' }}
                               onClick={() => handleDeleteTemplate(template.template_id)}
@@ -242,7 +228,7 @@ const Templates = () => {
                   count={totalPages}
                   color="primary"
                   onChange={handlePageChange}
-                  defaultPage={currentPage}
+                  page={currentPage}
                 />
               </div>
             </CCardBody>

@@ -13,7 +13,7 @@ import {
   CRow,
   CSpinner,
 } from '@coreui/react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useLocation } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import ModeEditIcon from '@mui/icons-material/ModeEdit'
@@ -23,7 +23,8 @@ import axios from 'axios'
 import { LinearProgress } from '@mui/material' // Import LinearProgress
 
 const UpdateTemplate = () => {
-  const { id } = useParams() // Retrieve the template ID from params
+  const location = useLocation()
+  const id = location.state?.templateId
   const navigate = useNavigate()
 
   const [templateName, setTemplateName] = useState('')
@@ -267,7 +268,7 @@ const UpdateTemplate = () => {
       await axiosInstance.put(`template/${id}`, requestBody)
 
       toast.success('Template updated successfully', { position: toast.POSITION.TOP_RIGHT })
-      navigate('/templates/1/25')
+      navigate('/templates')
     } catch (error) {
       console.error('Error updating template:', error)
       toast.error(error?.response?.data?.message || 'Failed to update template', {

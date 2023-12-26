@@ -65,7 +65,7 @@ const AddTemplate = () => {
         const formData = new FormData()
         formData.append('name', newFile?.name)
 
-        const fileName = newFile?.name.replace(/ /g,"_")
+        const fileName = newFile?.name.replace(/ /g, '_')
 
         // upload to get signed URL
         const responseOne = await axiosInstance.get(
@@ -77,29 +77,30 @@ const AddTemplate = () => {
         const fileExtension = newFile.type
 
         // const key = responseOne?.data?.data?.key + '.' + fileExtension
-        const key = responseOne?.data?.data?.key;
-        const url = responseOne?.data?.data?.url;
-        console.log('responseOne : ', responseOne.data);
- 
+        const key = responseOne?.data?.data?.key
+        const url = responseOne?.data?.data?.url
+        console.log('responseOne : ', responseOne.data)
+
         setTemplateKey(key)
         setTemplateType(newFile?.type)
         setTemplateSize(newFile?.size)
         setTemplateUrl(url)
 
         // upload to API
-        await axios.put(signedUrl, newFile, {
-          headers: {
-            'Content-Type': newFile.type,
-          },
-        })
-        .then(response => {
-          if(response.status == 200){
-              setProgress((prevProgress) => 100);
-          }
-        })
-        .catch(error => {
-          console.log('Upload error:', error);
-        });
+        await axios
+          .put(signedUrl, newFile, {
+            headers: {
+              'Content-Type': newFile.type,
+            },
+          })
+          .then((response) => {
+            if (response.status == 200) {
+              setProgress((prevProgress) => 100)
+            }
+          })
+          .catch((error) => {
+            console.log('Upload error:', error)
+          })
       }
 
       // file is bigger than 5 mb
@@ -238,7 +239,7 @@ const AddTemplate = () => {
       const response = await axiosInstance.post('template', requestBody)
 
       toast.success('Template added successfully', { position: toast.POSITION.TOP_RIGHT })
-      navigate('/templates/1/25')
+      navigate('/templates')
     } catch (error) {
       console.error('Error adding template:', error)
       toast.error(error?.response?.data?.message || 'Failed to add template', {

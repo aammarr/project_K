@@ -73,10 +73,8 @@ const routes = [
   },
   { path: '/categories/add', name: 'Add Category', element: AddCategory },
   { path: '/categories/update', name: 'Update Category', element: UpdateCategory },
-
   { path: '/templates/add', name: 'Add Template', element: addTemplate },
-  { path: '/templates/update/:id', name: 'Update Template', element: UpdateTemplate },
-
+  { path: '/templates/update', name: 'Update Template', element: UpdateTemplate },
   { path: '/theme', name: 'Theme', element: Colors, exact: true },
   { path: '/theme/colors', name: 'Colors', element: Colors },
   { path: '/theme/typography', name: 'Typography', element: Typography },
