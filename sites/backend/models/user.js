@@ -1,6 +1,7 @@
 import db from './dbConnection.js';
 
 export default {
+  // 
   create: async (profileObj) => {
     const fields = Object.keys(profileObj);
     const values = fields.map((field) => `'${profileObj[field]}'`).join(',');
@@ -10,6 +11,8 @@ export default {
     console.log(rows)
     return rows.insertId;
   },
+
+  // 
   findByEmail: async (email) => {
     const sql = `
       SELECT * FROM users
@@ -19,6 +22,8 @@ export default {
     const [rows] = await db.query(sql, params);
     return rows;
   },
+  
+  // 
   updateById: async (id, userData) => {
     let sql = 'UPDATE users SET';
     const fields = Object.keys(userData);
@@ -26,17 +31,27 @@ export default {
       sql += ` ${fields[i]} = '${userData[fields[i]]}',`;
     }
     sql = sql.slice(0, -1); 
-    sql += ` WHERE id = ${id}`;
+    sql += ` WHERE user_id = ${id}`;
     return await db.query(sql);
   },
 
+  // 
   findById: async (id) => {
     const sql = `
       SELECT * FROM users
-      WHERE id = ?
+      WHERE user_id = ?
     `;
     const params = [id];
     const [rows] = await db.query(sql, params);
     return rows;
   },
+
+  //
+  findAllUsers:async (searchCriteria, userCondition, options, offset)=>{
+    const sql = `SELECT u.* FROM users as u
+      WHERE u.role_id != 1 ${userCondition}
+      Limit ${options.limit} offset ${offset}`;
+    const rows = await db.query(sql);
+    return rows;
+  }
 };
