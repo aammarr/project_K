@@ -45,7 +45,7 @@ const Templates = () => {
   const [searchText, setSearchText] = useState('')
 
   const handleButtonClick = () => {
-    navigate('/templates/add')
+    navigate('/add-template')
   }
 
   const handleDownloadTemplate = async (key) => {
@@ -79,7 +79,7 @@ const Templates = () => {
   }, [currentPage, limit])
 
   const handleUpdateTemplate = (templateId) => {
-    navigate('/templates/update', { state: { templateId } })
+    navigate('/edit-template', { state: { templateId } })
   }
 
   const handleDeleteTemplate = (templateId) => {
