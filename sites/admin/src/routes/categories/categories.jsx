@@ -44,7 +44,7 @@ const Categories = () => {
   const [limit, setLimit] = useState(25)
 
   const handleButtonClick = () => {
-    navigate('/categories/add')
+    navigate('/add-category')
   }
 
   const fetchCategories = async () => {
@@ -71,7 +71,7 @@ const Categories = () => {
   }, [currentPage, limit])
 
   const handleUpdateCategory = (categoryId) => {
-    navigate('/categories/update', { state: { categoryId } })
+    navigate('/edit-category', { state: { categoryId } })
   }
 
   const handleDeleteCategory = (categoryId) => {

@@ -14,7 +14,7 @@ import {
   CSpinner,
 } from '@coreui/react'
 import axiosInstance from '../../axios/axiosConfig'
-import { useNavigate, useParams, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
