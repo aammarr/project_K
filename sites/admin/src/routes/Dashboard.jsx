@@ -180,8 +180,8 @@ const Dashboard = () => {
 
   return (
     <>
-      <WidgetsDropdown />
-      <CCard className="mb-4">
+      {/* <WidgetsDropdown /> */}
+      {/* <CCard className="mb-4">
         <CCardBody>
           <CRow>
             <CCol sm={5}>
@@ -453,7 +453,7 @@ const Dashboard = () => {
             </CCardBody>
           </CCard>
         </CCol>
-      </CRow>
+      </CRow> */}
     </>
   )
 }
