@@ -43,6 +43,15 @@ const Templates = () => {
   const [totalItems, setTotalItems] = useState(0)
   const [limit, setLimit] = useState(25)
   const [searchText, setSearchText] = useState('')
+  const [modalVisible, setModalVisible] = useState(false)
+
+  const openModal = () => {
+    setModalVisible(true)
+  }
+
+  const closeModal = () => {
+    setModalVisible(false)
+  }
 
   const handleButtonClick = () => {
     navigate('/add-template')
@@ -180,6 +189,8 @@ const Templates = () => {
                     <CTableHead color="light">
                       <CTableRow>
                         <CTableHeaderCell>Template ID</CTableHeaderCell>
+                        <CTableHeaderCell>Thumbnail</CTableHeaderCell>
+
                         <CTableHeaderCell>Template Name</CTableHeaderCell>
                         <CTableHeaderCell>Template Code</CTableHeaderCell>
                         <CTableHeaderCell>Category Name</CTableHeaderCell>
@@ -192,6 +203,33 @@ const Templates = () => {
                       {templates.map((template) => (
                         <CTableRow key={template.template_id}>
                           <CTableDataCell>{template.template_id}</CTableDataCell>
+                          <CTableDataCell>
+                            {template?.template_thumbnail ? (
+                              <img
+                                src="your-image-url.jpg"
+                                alt="thumbnail"
+                                style={{ cursor: 'pointer' }}
+                                onClick={openModal}
+                              />
+                            ) : (
+                              'No thumbnail'
+                            )}
+
+                            {/* Modal */}
+                            <CModal visible={modalVisible} onClose={closeModal}>
+                              <CModalHeader closeButton>
+                                <CModalTitle>Image Preview</CModalTitle>
+                              </CModalHeader>
+                              <CModalBody>
+                                {/* Image inside modal */}
+                                <img
+                                  src="your-image-url.jpg"
+                                  alt="thumbnail"
+                                  style={{ width: '100%' }}
+                                />
+                              </CModalBody>
+                            </CModal>
+                          </CTableDataCell>
                           <CTableDataCell>{template.template_name}</CTableDataCell>
                           <CTableDataCell>{template.template_code}</CTableDataCell>
                           <CTableDataCell>{template.category_name}</CTableDataCell>

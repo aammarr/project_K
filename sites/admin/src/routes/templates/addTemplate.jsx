@@ -30,11 +30,18 @@ const AddTemplate = () => {
   const [templateKey, setTemplateKey] = useState('')
   const [templateSize, setTemplateSize] = useState('')
   const [templateUrl, setTemplateUrl] = useState('')
+  const [thumbnail, setThumbnail] = useState(null)
 
   const [file, setFile] = useState(null)
   const [loading, setLoading] = useState(false)
   const [progress, setProgress] = useState(0) // Progress state
   const navigate = useNavigate()
+
+  const handleThumbnailUpload = async (event) => {
+    setThumbnail(event.target.files[0])
+  }
+
+  console.log(thumbnail)
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -297,6 +304,14 @@ const AddTemplate = () => {
                   </option>
                 ))}
               </CFormSelect>
+
+              <CFormLabel htmlFor="thumbnail">Choose Thumbnail</CFormLabel>
+              <CFormInput
+                type="file"
+                id="thumbnail"
+                accept="image/*"
+                onChange={handleThumbnailUpload}
+              />
 
               <CFormLabel htmlFor="file">Upload File</CFormLabel>
               <CFormInput type="file" id="file" onChange={handleFileUpload} />
