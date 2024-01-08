@@ -18,18 +18,18 @@ export default {
         try {
 
             const { category_id, template_code, template_name, template_description,
-                template_key, template_size,template_type,template_url
+                template_key, template_size,template_type,template_url,template_thumbnail
             } = req.body;
 
             const user_id = req?.user.userId;
             const template_view_count = 0;
             const template_download_count = 0;
-            if(!template_name || !template_description || !template_url){
+            if(!template_name || !template_description || !template_url || !template_thumbnail){
               return res.status(401).send({ status: false, message: 'Template name, Template Description & Template URL is required' });
             }
 
             await template.createTemplate({user_id, category_id,template_code, template_name, template_description,
-                template_key, template_size,template_type,template_url,
+                template_key, template_size,template_type,template_url, template_thumbnail, 
                 template_view_count, template_download_count
             });
     
