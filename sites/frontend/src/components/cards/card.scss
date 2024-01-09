@@ -1,0 +1,14 @@
+// src/components/ResponsiveCard.scss
+
+.card-link {
+  text-decoration: none;
+
+  &:hover {
+    .card {
+      background-color: #f8f9fa; // Change the background color on hover
+      cursor: pointer; // Change the cursor on hover
+    }
+  }
+}
+
+// Add any additional styles as needed
