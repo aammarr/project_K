@@ -12,6 +12,17 @@ export default {
         const rows = await db.query(sql);
         return rows;
     },
+    
+    //
+    getAllTemplatesCount: async (searchCriteria) => {
+        const sql = `SELECT count(*) as count FROM templates as t
+                    left join categories as c
+                    on t.category_id = c.category_id 
+                    WHERE t.template_name LIKE '%${searchCriteria.template_name}%'`
+        const rows = await db.query(sql);
+        return rows;
+    },
+
     // 
     getCountAllTemplates: async (searchCriteria,options,offset) => {
         const sql = `SELECT count(*) as count FROM templates as t

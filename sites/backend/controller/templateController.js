@@ -42,7 +42,7 @@ export default {
     // Get all templates
     getAllTemplates: async (req, res) => {
         try {
-            const { page = 1, limit = 10, search = ''} = req.query;
+            const { page = 1, limit = 10, search = '' } = req.query;
             const tableName = 'templates';
 
             const options = {
@@ -50,35 +50,38 @@ export default {
                 limit: parseInt(limit, 10),
             };
             const offset = (options.page - 1) * options.limit;
-            
-            // Define the search criteria
+
+            // Define the search criteria using the search variable
             const searchCriteria = {
-                template_name: req.query.search,
+                template_name: search, // Use the search variable here
             };
-            
-            const data = await template.getAllTemplates(searchCriteria, options,offset);
-            
-            // Calculate next and previous page numbers
-            const totalCount = await template.tableCount(tableName);
+
+            // Get the count based on both search criteria and overall criteria
+            const totalCount = await template.getAllTemplatesCount(searchCriteria);
+
+            const data = await template.getAllTemplates(searchCriteria, options, offset);
+           
+            // Calculate next and previous page numbers based on the filtered count
             const totalPages = Math.ceil(totalCount[0].count / options.limit);
-            const nextPage = options.page < totalPages ? options.page + 1 : null;
             const prevPage = options.page > 1 ? options.page - 1 : null;
+            const currPage = options.page > 1 ? options.page: options.page;
+            const nextPage = options.page < totalPages ? options.page + 1 : null;
 
             return res.status(200).send({
                 status: true,
-                data:data,
-                pagination:{
-                    totalResults:totalCount[0].count,
-                    totalPages:totalPages,
-                    nextPage:nextPage,
-                    prevPage:prevPage,
+                data: data,
+                pagination: {
+                    totalResults: totalCount[0].count,
+                    totalPages: totalPages,
+                    prevPage: prevPage,
+                    currPage: currPage,
+                    nextPage: nextPage,
                 },
                 message: 'Template fetched successfully.',
             });
         } catch (error) {
             return res.status(500).send({ status: false, message: 'Internal server error', error });
         }
-
     },
 
     // Get all templates
