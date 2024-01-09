@@ -1,14 +1,57 @@
-// src/components/ResponsiveCard.scss
+// src/components/card.scss
 
 .card-link {
   text-decoration: none;
+  color: inherit; /* Inherit text color from the parent */
 
-  &:hover {
-    .card {
-      background-color: #f8f9fa; // Change the background color on hover
-      cursor: pointer; // Change the cursor on hover
+  .card {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: box-shadow 0.3s, transform 0.3s, background-color 0.3s,
+      opacity 0.3s;
+
+    &:hover {
+      background-color: #f8f9fa;
+      cursor: pointer;
+      transform: scale(1.05);
+      opacity: 0.9; /* Decrease opacity on hover */
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); /* Add box shadow on hover */
+    }
+
+    .card-img-top {
+      width: 100%;
+      height: auto;
+    }
+
+    .card-body {
+      padding: 15px;
+
+      .card-title {
+        font-size: 1.25rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .card-text {
+        font-size: 1rem;
+        color: #6c757d; /* Set text color for description */
+      }
+    }
+
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 15px;
+      background-color: #f8f9fa; /* Footer background color */
+      color: #6c757d; /* Text color for the footer */
+
+      small {
+        font-size: 0.9rem;
+      }
     }
   }
 }
 
-// Add any additional styles as needed
+/* Add any additional styles as needed */

@@ -1,0 +1,28 @@
+// src/components/Header.scss
+
+.header {
+  background-color: #f3ecf7; // Dark background color
+  padding: 10px 20px; // Padding for the header
+  display: flex; // Use flexbox for layout
+  align-items: center; // Center items vertically
+  justify-content: space-between;
+
+  .logo {
+    color: black; // Text color for the logo
+    font-size: 24px; // Font size for the logo
+    font-weight: bold; // Font weight for the logo
+    text-decoration: none; // Remove default text decoration
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    a {
+      color: black; // Text color for the links
+      text-decoration: none; // Remove default text decoration
+      margin-left: 20px; // Spacing between links
+    }
+  }
+}

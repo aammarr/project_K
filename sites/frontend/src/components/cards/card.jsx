@@ -11,19 +11,21 @@ const ResponsiveCard = ({
   uploadTime,
 }) => {
   return (
-    <Link
-      to="/details"
-      className="card-link card my-3"
-      style={{ width: "400px" }}
-    >
-      <img src={imgSrc} className="card-img-top" alt="Card Image" />
-      <div className="card-body">
-        <h5 className="card-title">{title}</h5>
-        <p className="card-text">{description}</p>
-      </div>
-      <div className="card-footer d-flex justify-content-between">
-        <small className="text-muted">{category}</small>
-        <small className="text-muted">{uploadTime}</small>
+    <Link to="/details" className="card-link mb-4" style={{ width: "350px" }}>
+      <div className="card">
+        <img src={imgSrc} className="card-img-top" alt="Card Image" />
+        <div className="card-body">
+          <h5 className="card-title">{title}</h5>
+          <p className="card-text">{description}</p>
+        </div>
+        <div className="card-footer d-flex justify-content-between align-items-center">
+          {/* Badge as a chip for category */}
+          <span className="badge bg-secondary">{category}</span>
+
+          <div>
+            <small className="text-muted">{uploadTime}</small>
+          </div>
+        </div>
       </div>
     </Link>
   );
