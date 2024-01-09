@@ -47,11 +47,9 @@ router.delete("/:id", auth, deleteTemplateById);
 
 
 router.post('/media', upload.single('file'),  async (req, res) => {
-    
     const bucketName = 'project-k-templates';
     const fileName = Date.now().toString()+"_"+req.file.originalname;
     const fileContent = req.file.buffer;
-    console.log('-file: ',bucketName,fileName);
 
     // Set the parameters for S3 upload with public-read ACL
     const params = {
@@ -59,16 +57,12 @@ router.post('/media', upload.single('file'),  async (req, res) => {
         Key: fileName,
         Body: fileContent,
     };
-    
-    console.log('-params: ',params);
     // Upload the file to S3
     s3.upload(params, (err, data) => {
         if (err) {
             console.error('Error uploading file to S3:', err);
             res.status(500).send('Error uploading file to S3');
         } else {
-            console.log('File uploaded successfully:', data.Location, "aaaaa : --- " );
-            // The public URL of the file
             const publicUrl = data.Location;
             return res.send({ 'public_url':publicUrl }).status(200);
         }
