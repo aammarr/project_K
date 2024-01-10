@@ -21,6 +21,7 @@ import GetAppIcon from '@mui/icons-material/GetApp'
 import axiosInstance from 'src/axios/axiosConfig'
 import axios from 'axios'
 import { LinearProgress } from '@mui/material' // Import LinearProgress
+import CloseIcon from '@mui/icons-material/Close'
 
 const UpdateTemplate = () => {
   const location = useLocation()
@@ -36,7 +37,11 @@ const UpdateTemplate = () => {
   const [templateSize, setTemplateSize] = useState('')
   const [templateUrl, setTemplateUrl] = useState('')
   const [templateType, setTemplateType] = useState('')
+  const [thumbnailUrl, setThumbnailUrl] = useState('')
+  const [thumbnail, setThumbnail] = useState(null)
+
   const [progress, setProgress] = useState(0) // Progress state
+  const [thumbnailProgress, setThumbnailProgress] = useState(0)
 
   const [categories, setCategories] = useState([])
   const [categoryId, setCategoryId] = useState('')
@@ -46,7 +51,46 @@ const UpdateTemplate = () => {
   const [editIconVisible, setEditIconVisible] = useState(true)
 
   const [isUploading, setIsUploading] = useState(false)
+  const handleRemoveThumbnail = () => {
+    setThumbnailUrl('')
+    setThumbnail(null) // Reset the file
+  }
 
+  const handleThumbnailUpload = async (event) => {
+    try {
+      setThumbnailProgress(20)
+      setThumbnail(event.target.files[0])
+      const file = event.target.files[0]
+      console.log(file)
+      if (file) {
+        const formData = new FormData()
+        formData.append('file', file)
+
+        console.log(formData.get('file'))
+
+        const response = await axiosInstance.post('/template/media', formData, {
+          headers: {
+            'Content-Type': file?.type, // Set the content type to binary data
+          },
+        })
+
+        // Assuming the response contains a public_url field
+        const publicUrl = response.data.public_url
+        setThumbnailProgress(80)
+
+        console.log(response)
+        console.log(publicUrl)
+
+        // Set the templateThumbnail state
+        setThumbnailUrl(publicUrl)
+      }
+    } catch (error) {
+      console.error('Error uploading thumbnail:', error.message)
+      // Handle error as needed
+    } finally {
+      setThumbnailProgress(100)
+    }
+  }
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -221,6 +265,7 @@ const UpdateTemplate = () => {
       setTemplateKey(templateData.template_key)
       setTemplateDownloadCount(templateData.template_download_count)
       setTemplateViewCount(templateData.template_view_count)
+      setThumbnailUrl(templateData.template_thumbnail) // Set the thumbnail URL
     } catch (error) {
       console.error('Error fetching template data:', error)
       toast.error('Error fetching template data')
@@ -248,12 +293,16 @@ const UpdateTemplate = () => {
       }
 
       setLoading(true)
-
+      if (thumbnailUrl === '' && !thumbnail) {
+        toast.error('Please select a thumbnail.', { position: toast.POSITION.TOP_RIGHT })
+        return
+      }
       const requestBody = {
         template_name: templateName,
         template_description: templateDescription,
         template_code: templateCode,
         category_id: categoryId,
+        template_thumbnail: thumbnailUrl,
       }
 
       // Update template data using the provided template ID
@@ -268,6 +317,8 @@ const UpdateTemplate = () => {
       await axiosInstance.put(`template/${id}`, requestBody)
 
       toast.success('Template updated successfully', { position: toast.POSITION.TOP_RIGHT })
+      setEditable(false) // Turn off edit mode after updating
+      setEditIconVisible(true) // Show the edit icon again
       navigate('/templates')
     } catch (error) {
       console.error('Error updating template:', error)
@@ -276,8 +327,6 @@ const UpdateTemplate = () => {
       })
     } finally {
       setLoading(false)
-      setEditable(false) // Turn off edit mode after updating
-      setEditIconVisible(true) // Show the edit icon again
     }
   }
 
@@ -313,6 +362,12 @@ const UpdateTemplate = () => {
             )}
           </CCardHeader>
           <CCardBody>
+            {/* Display the thumbnail image if thumbnailUrl exists */}
+            {thumbnailUrl && !editable && (
+              <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+                <img src={thumbnailUrl} alt="Thumbnail" style={{ maxWidth: '300px' }} />
+              </div>
+            )}
             <CForm>
               <CFormLabel htmlFor="templateName">Template Name</CFormLabel>
               <CFormInput
@@ -359,10 +414,61 @@ const UpdateTemplate = () => {
                 ))}
               </CFormSelect>
 
+              {editable && (
+                <>
+                  <CFormLabel htmlFor="thumbnail">Thumbnail</CFormLabel>
+                  {/* Thumbnail Input Section */}
+                  {!thumbnailUrl && (
+                    <>
+                      <CFormInput
+                        type="file"
+                        id="thumbnail"
+                        accept="image/*"
+                        onChange={handleThumbnailUpload}
+                      />
+                      {/* Display progress bar when thumbnail is being uploaded */}
+                      {thumbnailProgress > 0 && thumbnailProgress < 100 && (
+                        <>
+                          <LinearProgress
+                            variant="determinate"
+                            value={thumbnailProgress}
+                            style={{ marginTop: '10px' }}
+                          />
+                          <div
+                            style={{ textAlign: 'center', marginTop: '5px' }}
+                          >{`${thumbnailProgress}% Uploaded`}</div>
+                        </>
+                      )}
+                    </>
+                  )}
+
+                  {/* Display Thumbnail Image */}
+                  {thumbnailUrl && (
+                    <div style={{ position: 'relative' }}>
+                      {/* Cross Icon to Remove Thumbnail */}
+                      <CloseIcon
+                        style={{
+                          position: 'absolute',
+                          top: '5px',
+                          right: '5px',
+                          cursor: 'pointer',
+                        }}
+                        onClick={handleRemoveThumbnail}
+                      />
+                      <img
+                        src={thumbnailUrl}
+                        alt="thumbnail"
+                        style={{ width: '100px', marginTop: '10px' }}
+                      />
+                    </div>
+                  )}
+                </>
+              )}
+
               {/* Conditionally render the "Choose File" button based on the "editable" state */}
               {editable && (
                 <>
-                  <CFormLabel htmlFor="file">Choose File</CFormLabel>
+                  <CFormLabel htmlFor="file">File</CFormLabel>
                   <CFormInput
                     type="file"
                     id="file"

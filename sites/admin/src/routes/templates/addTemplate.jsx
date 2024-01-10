@@ -19,6 +19,7 @@ import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import axios from 'axios'
+import CloseIcon from '@mui/icons-material/Close'
 
 const AddTemplate = () => {
   const [templateName, setTemplateName] = useState('')
@@ -41,6 +42,11 @@ const AddTemplate = () => {
   const navigate = useNavigate()
 
   // Assuming you have setThumbnail and templateThumbnail using useState
+
+  const handleRemoveThumbnail = () => {
+    setThumbnailUrl('')
+    setThumbnail(null) // Reset the file
+  }
 
   const handleThumbnailUpload = async (event) => {
     try {
@@ -254,10 +260,15 @@ const AddTemplate = () => {
         toast.error('Please fill in all fields', { position: toast.POSITION.TOP_RIGHT })
         return
       }
+      if (!thumbnail) {
+        toast.error('Please select a thumbnail.', { position: toast.POSITION.TOP_RIGHT })
+        return
+      }
       if (!file) {
         toast.error('Please select a file first.', { position: toast.POSITION.TOP_RIGHT })
         return
       }
+
       if (!templateKey || !templateSize || !templateType) {
         toast.error('Please wait for the file to upload.', { position: toast.POSITION.TOP_RIGHT })
         return
@@ -345,26 +356,51 @@ const AddTemplate = () => {
                 ))}
               </CFormSelect>
 
-              <CFormLabel htmlFor="thumbnail">Choose Thumbnail</CFormLabel>
-              <CFormInput
-                type="file"
-                id="thumbnail"
-                accept="image/*"
-                onChange={handleThumbnailUpload}
-              />
-
-              {/* Display progress bar when thumbnail is being uploaded */}
-              {thumbnailProgress > 0 && thumbnailProgress < 100 && (
+              <CFormLabel htmlFor="thumbnail">Thumbnail</CFormLabel>
+              {/* Thumbnail Input Section */}
+              {!thumbnailUrl && (
                 <>
-                  <LinearProgress
-                    variant="determinate"
-                    value={thumbnailProgress}
-                    style={{ marginTop: '10px' }}
+                  <CFormInput
+                    type="file"
+                    id="thumbnail"
+                    accept="image/*"
+                    onChange={handleThumbnailUpload}
                   />
-                  <div
-                    style={{ textAlign: 'center', marginTop: '5px' }}
-                  >{`${thumbnailProgress}% Uploaded`}</div>
+                  {/* Display progress bar when thumbnail is being uploaded */}
+                  {thumbnailProgress > 0 && thumbnailProgress < 100 && (
+                    <>
+                      <LinearProgress
+                        variant="determinate"
+                        value={thumbnailProgress}
+                        style={{ marginTop: '10px' }}
+                      />
+                      <div
+                        style={{ textAlign: 'center', marginTop: '5px' }}
+                      >{`${thumbnailProgress}% Uploaded`}</div>
+                    </>
+                  )}
                 </>
+              )}
+
+              {/* Display Thumbnail Image */}
+              {thumbnailUrl && (
+                <div style={{ position: 'relative' }}>
+                  {/* Cross Icon to Remove Thumbnail */}
+                  <CloseIcon
+                    style={{
+                      position: 'absolute',
+                      top: '5px',
+                      right: '5px',
+                      cursor: 'pointer',
+                    }}
+                    onClick={handleRemoveThumbnail}
+                  />
+                  <img
+                    src={thumbnailUrl}
+                    alt="thumbnail"
+                    style={{ width: '100px', marginTop: '10px' }}
+                  />
+                </div>
               )}
 
               <CFormLabel htmlFor="file">Upload File</CFormLabel>
