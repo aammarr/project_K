@@ -11,6 +11,7 @@
     overflow: hidden;
     transition: box-shadow 0.3s, transform 0.3s, background-color 0.3s,
       opacity 0.3s;
+    min-height: 400px;
 
     &:hover {
       background-color: #f8f9fa;

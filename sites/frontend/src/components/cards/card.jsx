@@ -13,7 +13,11 @@ const ResponsiveCard = ({
   return (
     <Link to="/details" className="card-link mb-4" style={{ width: "350px" }}>
       <div className="card">
-        <img src={imgSrc} className="card-img-top" alt="Card Image" />
+        <img
+          src={imgSrc || "images/no-image.jpg"}
+          className="card-img-top"
+          alt="Card Image"
+        />
         <div className="card-body">
           <h5 className="card-title">{title}</h5>
           <p className="card-text">{description}</p>
