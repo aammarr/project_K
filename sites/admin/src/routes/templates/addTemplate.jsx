@@ -31,17 +31,52 @@ const AddTemplate = () => {
   const [templateSize, setTemplateSize] = useState('')
   const [templateUrl, setTemplateUrl] = useState('')
   const [thumbnail, setThumbnail] = useState(null)
+  const [thumbnailUrl, setThumbnailUrl] = useState('')
 
   const [file, setFile] = useState(null)
   const [loading, setLoading] = useState(false)
   const [progress, setProgress] = useState(0) // Progress state
+  const [thumbnailProgress, setThumbnailProgress] = useState(0)
+
   const navigate = useNavigate()
 
-  const handleThumbnailUpload = async (event) => {
-    setThumbnail(event.target.files[0])
-  }
+  // Assuming you have setThumbnail and templateThumbnail using useState
 
-  console.log(thumbnail)
+  const handleThumbnailUpload = async (event) => {
+    try {
+      setThumbnailProgress(20)
+      setThumbnail(event.target.files[0])
+      const file = event.target.files[0]
+      console.log(file)
+      if (file) {
+        const formData = new FormData()
+        formData.append('file', file)
+
+        console.log(formData.get('file'))
+
+        const response = await axiosInstance.post('/template/media', formData, {
+          headers: {
+            'Content-Type': file?.type, // Set the content type to binary data
+          },
+        })
+
+        // Assuming the response contains a public_url field
+        const publicUrl = response.data.public_url
+        setThumbnailProgress(80)
+
+        console.log(response)
+        console.log(publicUrl)
+
+        // Set the templateThumbnail state
+        setThumbnailUrl(publicUrl)
+      }
+    } catch (error) {
+      console.error('Error uploading thumbnail:', error.message)
+      // Handle error as needed
+    } finally {
+      setThumbnailProgress(100)
+    }
+  }
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -211,6 +246,7 @@ const AddTemplate = () => {
       templateSize,
       templateUrl,
       templateType,
+      thumbnailUrl,
     })
 
     try {
@@ -241,6 +277,10 @@ const AddTemplate = () => {
       // Include template_url only if it's not an empty string
       if (templateUrl !== '') {
         requestBody.template_url = templateUrl
+      }
+
+      if (thumbnailUrl !== '') {
+        requestBody.template_thumbnail = thumbnailUrl
       }
 
       const response = await axiosInstance.post('template', requestBody)
@@ -312,6 +352,20 @@ const AddTemplate = () => {
                 accept="image/*"
                 onChange={handleThumbnailUpload}
               />
+
+              {/* Display progress bar when thumbnail is being uploaded */}
+              {thumbnailProgress > 0 && thumbnailProgress < 100 && (
+                <>
+                  <LinearProgress
+                    variant="determinate"
+                    value={thumbnailProgress}
+                    style={{ marginTop: '10px' }}
+                  />
+                  <div
+                    style={{ textAlign: 'center', marginTop: '5px' }}
+                  >{`${thumbnailProgress}% Uploaded`}</div>
+                </>
+              )}
 
               <CFormLabel htmlFor="file">Upload File</CFormLabel>
               <CFormInput type="file" id="file" onChange={handleFileUpload} />

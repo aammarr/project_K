@@ -45,12 +45,17 @@ const Templates = () => {
   const [searchText, setSearchText] = useState('')
   const [modalVisible, setModalVisible] = useState(false)
 
-  const openModal = () => {
+  const [modalImage, setModalImage] = useState('')
+
+  const openModal = (imageURL) => {
+    setModalImage(imageURL)
+
     setModalVisible(true)
   }
 
   const closeModal = () => {
     setModalVisible(false)
+    setModalImage('')
   }
 
   const handleButtonClick = () => {
@@ -205,12 +210,15 @@ const Templates = () => {
                           <CTableDataCell>{template.template_id}</CTableDataCell>
                           <CTableDataCell>
                             {template?.template_thumbnail ? (
-                              <img
-                                src="your-image-url.jpg"
-                                alt="thumbnail"
-                                style={{ cursor: 'pointer' }}
-                                onClick={openModal}
-                              />
+                              <div>
+                                <img
+                                  src={template?.template_thumbnail}
+                                  alt="thumbnail"
+                                  style={{ cursor: 'pointer' }}
+                                  onClick={() => openModal(template?.template_thumbnail)}
+                                  width="50px"
+                                />
+                              </div>
                             ) : (
                               'No thumbnail'
                             )}
@@ -222,11 +230,7 @@ const Templates = () => {
                               </CModalHeader>
                               <CModalBody>
                                 {/* Image inside modal */}
-                                <img
-                                  src="your-image-url.jpg"
-                                  alt="thumbnail"
-                                  style={{ width: '100%' }}
-                                />
+                                <img src={modalImage} alt="thumbnail" style={{ width: '100%' }} />
                               </CModalBody>
                             </CModal>
                           </CTableDataCell>
