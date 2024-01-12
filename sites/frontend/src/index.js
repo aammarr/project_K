@@ -5,6 +5,8 @@ import App from "./App";
 import { Provider } from "react-redux";
 import { BrowserRouter } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import reportWebVitals from "./reportWebVitals";
 import { applyMiddleware, createStore } from "redux";
@@ -19,9 +21,10 @@ const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
     <Provider store={store}>
-      <PersistGate persistor={persistor}>
+      <PersistGate loading={null} persistor={persistor}>
         <BrowserRouter>
           <App />
+          <ToastContainer position="bottom-right" autoClose={5000} />
         </BrowserRouter>
       </PersistGate>
     </Provider>

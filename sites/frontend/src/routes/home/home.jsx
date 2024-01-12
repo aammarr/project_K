@@ -1,12 +1,13 @@
 // src/pages/Home.js
 import React, { useEffect, useState } from "react";
-import ResponsiveCard from "../components/cards/card";
-import CategoriesList from "../components/categoriesList/categoriesList";
+import ResponsiveCard from "../../components/cards/card";
+import CategoriesList from "../../components/categoriesList/categoriesList";
 import "./home.scss";
-import axiosInstance from "../axios/axiosConfig";
+import axiosInstance from "../../axios/axiosConfig";
 import { toast } from "react-toastify";
 import Pagination from "@mui/material/Pagination";
 import CircularProgress from "@mui/material/CircularProgress"; // Import CircularProgress
+import { useSelector } from "react-redux";
 
 const Home = () => {
   const [templates, setTemplates] = useState([]);
@@ -17,6 +18,7 @@ const Home = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [totalItems, setTotalItems] = useState(0);
   const [categories, setCategories] = useState([]);
+  const [categoryId, setCategoryId] = useState("");
 
   // Function to fetch categories
   const fetchCategories = async () => {
@@ -24,7 +26,10 @@ const Home = () => {
       const response = await axiosInstance.get(
         "category?limit=1000&page=1&search"
       );
-      setCategories(response?.data?.data);
+      setCategories([
+        { category_id: "", category_name: "All" },
+        ...response?.data?.data,
+      ]);
     } catch (error) {
       console.error("Error fetching categories:", error);
       toast.error("Error fetching categories");
@@ -35,8 +40,13 @@ const Home = () => {
     fetchCategories();
   }, []);
 
+  const handleCategoryClick = (categoryId) => {
+    console.log(categoryId);
+    setCurrentPage(1);
+    setCategoryId(categoryId); // Pass the category ID to fetchTemplates
+  };
+
   function convertDateFormat(inputDate) {
-    console.log(inputDate);
     const date = new Date(inputDate);
     const options = { day: "2-digit", month: "2-digit", year: "numeric" };
     return date.toLocaleDateString("en-GB", options);
@@ -83,16 +93,17 @@ const Home = () => {
 
   useEffect(() => {
     fetchTemplates();
-  }, [currentPage, limit]);
-
-  console.log(templates);
+  }, [currentPage, limit, categoryId]);
 
   return (
     <div className="container-fluid">
       <div className="row">
         {/* Left Container (1/4th size) */}
         <div className="col-lg-2 mt-5">
-          <CategoriesList categories={categories} />
+          <CategoriesList
+            categories={categories}
+            onCategoryClick={handleCategoryClick}
+          />
         </div>
 
         {/* Right Container (3/4th size) */}
