@@ -6,9 +6,9 @@ export default {
 		const fields = Object.keys(profileObj);
 		const values = fields.map((field) => `'${profileObj[field]}'`).join(',');
 		const sql = `INSERT INTO users (${fields.join(',')}) VALUES (${values})`;
-		console.log(sql)
+
 		const rows = await db.query(sql);
-		console.log(rows)
+
 		return rows.insertId;
 	},
 
@@ -52,7 +52,6 @@ export default {
 		WHERE u.role_id != 1 ${userCondition}
 		Limit ${options.limit} offset ${offset}`;
 		
-		console.log(sql);
 		const rows = await db.query(sql);
 		return rows;
 	},

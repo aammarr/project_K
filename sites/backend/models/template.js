@@ -8,7 +8,9 @@ export default {
                     left join categories as c
                     on t.category_id = c.category_id 
                     WHERE t.template_name LIKE '%${searchCriteria.template_name}%'
+                    order by t.template_id desc
                     Limit ${options.limit} offset ${offset}`;
+        console.log('getAllTemplates : ',sql)
         const rows = await db.query(sql);
         return rows;
     },
@@ -40,7 +42,10 @@ export default {
                     on t.category_id = c.category_id 
                     WHERE t.category_id = '${searchCriteria.category_id}'
                     AND t.template_name LIKE '%${searchCriteria.template_name}%'
+                    order by t.template_id desc
                     Limit ${options.limit} offset ${offset}`;
+        
+        console.log('getAllTemplatesByCategoryId : ',sql)
         const rows = await db.query(sql);
         return rows;
     },
