@@ -9,6 +9,6 @@ const { adminLogin, getUser, getAllUsers, updateUser } = userController;
 router.post("/login", adminLogin);
 router.get("/me", auth, getUser);
 router.put("/", auth, updateUser);
-router.get("/", auth, getAllUsers);
+router.get("/users", auth, getAllUsers);
 
 export default router;

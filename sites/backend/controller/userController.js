@@ -209,25 +209,20 @@ export default {
 		};
 		let userCondition = "";
 		userCondition += search
-			? `OR u.first_name LIKE '%${searchCriteria.template_name}%'`
+			? `AND (u.first_name LIKE '%${searchCriteria.template_name}%'`
 			: "";
 		userCondition += search
-			? `OR u.last_name LIKE '%${searchCriteria.template_name}%'`
+			? `OR u.last_name LIKE '%${searchCriteria.template_name}%' )`
 			: "";
 
-		const userRecords = await user.findAllUsers(
-			searchCriteria,
-			userCondition,
-			options,
-			offset
-		);
+		const userRecords = await user.findAllUsers(userCondition,options,offset);
 
 		// Calculate next and previous page numbers
-		const totalCount = await template.tableCount(tableName);
+		const totalCount = await user.allUsersCount(userCondition);
 		const totalPages = Math.ceil(totalCount[0].count / options.limit);
 		const nextPage = options.page < totalPages ? options.page + 1 : null;
 		const prevPage = options.page > 1 ? options.page - 1 : null;
-		console.log("----", totalPages, nextPage, prevPage);
+
 		if (!userRecords) {
 			return res
 			.status(200)
