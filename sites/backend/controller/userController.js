@@ -196,55 +196,85 @@ export default {
 	//
 	getAllUsers: async (req, res) => {
 		try {
-		const { page = 1, limit = 25, search = "" } = req.query;
-		const tableName = "users";
-		const options = {
-			page: parseInt(page, 10),
-			limit: parseInt(limit, 10),
-		};
-		const offset = (options.page - 1) * options.limit;
-		// Define the search criteria
-		const searchCriteria = {
-			template_name: req.query.search,
-		};
-		let userCondition = "";
-		userCondition += search
-			? `AND (u.first_name LIKE '%${searchCriteria.template_name}%'`
-			: "";
-		userCondition += search
-			? `OR u.last_name LIKE '%${searchCriteria.template_name}%' )`
-			: "";
+			const { page = 1, limit = 25, search = "" } = req.query;
+			const tableName = "users";
+			const options = {
+				page: parseInt(page, 10),
+				limit: parseInt(limit, 10),
+			};
+			const offset = (options.page - 1) * options.limit;
+			// Define the search criteria
+			const searchCriteria = {
+				template_name: req.query.search,
+			};
+			let userCondition = "";
+			userCondition += search
+				? `AND (u.first_name LIKE '%${searchCriteria.template_name}%'`
+				: "";
+			userCondition += search
+				? `OR u.last_name LIKE '%${searchCriteria.template_name}%' )`
+				: "";
 
-		const userRecords = await user.findAllUsers(userCondition,options,offset);
+			const userRecords = await user.findAllUsers(userCondition,options,offset);
 
-		// Calculate next and previous page numbers
-		const totalCount = await user.allUsersCount(userCondition);
-		const totalPages = Math.ceil(totalCount[0].count / options.limit);
-		const nextPage = options.page < totalPages ? options.page + 1 : null;
-		const prevPage = options.page > 1 ? options.page - 1 : null;
+			// Calculate next and previous page numbers
+			const totalCount = await user.allUsersCount(userCondition);
+			const totalPages = Math.ceil(totalCount[0].count / options.limit);
+			const nextPage = options.page < totalPages ? options.page + 1 : null;
+			const prevPage = options.page > 1 ? options.page - 1 : null;
 
-		if (!userRecords) {
-			return res
-			.status(200)
-			.send({ status: true, data: [], message: "No User Found." });
-		} else {
-			console.log(userRecords.length);
-			return res.status(200).send({
-			status: true,
-			data: userRecords,
-			pagination: {
-				totalResults: totalCount[0].count,
-				totalPages: totalPages,
-				nextPage: nextPage,
-				prevPage: prevPage,
-			},
-			message: "User fetched successfully.",
-			});
-		}
+			if (!userRecords) {
+				return res
+				.status(200)
+				.send({ status: true, data: [], message: "No User Found." });
+			} else {
+				console.log(userRecords.length);
+				return res.status(200).send({
+				status: true,
+				data: userRecords,
+				pagination: {
+					totalResults: totalCount[0].count,
+					totalPages: totalPages,
+					nextPage: nextPage,
+					prevPage: prevPage,
+				},
+				message: "User fetched successfully.",
+				});
+			}
 		} catch (error) {
-		res
+			res
 			.status(500)
 			.send({ status: false, message: "Internal server error: ", error });
 		}
 	},
+
+	//
+	updatePassword: async (req, res)=>{
+		try {
+			let { old_password, password } = req.body;
+
+			const userRecord = await user.findById(req.user.userId);
+			const passwordMatch = await bcrypt.compare(old_password, userRecord.password);
+			if (!passwordMatch) {
+				return res.status(401).send({ 
+					status: false,
+					message: "Wrong Password."
+				});
+			}
+			else{
+				const saltRounds = 10;
+				password = await bcrypt.hash(password, saltRounds);
+				await user.updateById(userRecord.user_id, {password});
+			}
+			
+			return res.status(200).send({
+				status: true,
+				message: "Password updated successfully.",
+			});
+		} catch (error) {
+			res
+			.status(500)
+			.send({ status: false, message: "Internal server error: ", error });
+		}
+	}
 };

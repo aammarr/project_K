@@ -9,20 +9,7 @@ const router = Router.Router();
 const { adminLogin, getUser, getAllUsers, updateUser } = userController;
 const { dashboardCount } = dashboardController;
 const { createCategory, getCategories, getCategoryById, updateCategoryById, deleteCategoryById } = categoryController;
-const {
-  createTemplate,
-  getAllTemplates,
-  getTemplateById,
-  updateTemplateById,
-  deleteTemplateById,
-//   getAllTemplatesByCategoryId,
-//   getUploadId,
-//   getSignedUrlMultipPart,
-//   fileSaveIntoDb,
-//   completeMultipartUpload,
-//   getPutSignedUrl,
-//   getDownloadUrl,
-} = templateController;
+const { createTemplate, getAllTemplates, getTemplateById, updateTemplateById, deleteTemplateById } = templateController;
 
 // login 
 router.post("/login", adminLogin);

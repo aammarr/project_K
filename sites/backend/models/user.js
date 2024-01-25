@@ -32,6 +32,7 @@ export default {
 		}
 		sql = sql.slice(0, -1); 
 		sql += ` WHERE user_id = ${id}`;
+
 		return await db.query(sql);
 	},
 
