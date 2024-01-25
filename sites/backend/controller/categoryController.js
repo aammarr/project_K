@@ -3,6 +3,7 @@ import template from "../models/template.js";
 
 
 export default {
+    
     //Add Category Function
     createCategory: async (req, res) => {
         try {
@@ -13,9 +14,18 @@ export default {
               return res.status(401).send({ status: false, message: 'Category name is required' });
             }
             
-            await categroy.createCategory({user_id, category_name,category_description,category_code});
+            let categoryId = await categroy.createCategory({user_id, category_name,category_description,category_code});
     
-            return res.status(200).send({ status: true, message: 'Category created successfully' });
+            return res.status(200).send({ 
+                status: true,
+                data:{
+                    "category_id":categoryId,
+                    "category_name":category_name,
+                    "category_description":category_description,
+                    "category_code":category_code
+                },
+                message: 'Category created successfully'
+            });
         } catch (error) {
         return res.status(500).send({ status: false, message: 'Internal server error', error });
         }
@@ -39,14 +49,11 @@ export default {
             const data = await categroy.getAllCategories(searchCriteria, options,offset);
 
             // Calculate next and previous page numbers
-            const totalCount = await template.tableCount(tableName);
+            const totalCount = await categroy.getAllCategoriesCount(searchCriteria, options,offset);
             const totalPages = Math.ceil(totalCount[0].count / options.limit);
             const nextPage = options.page < totalPages ? options.page + 1 : null;
             const prevPage = options.page > 1 ? options.page - 1 : null;
         
-
-            // const categories = await categroy.getAllCategories();
-            // return res.status(200).send({ status: true, data: categories, message: 'Categories fetched successfully' });
             return res.status(200).send({
                 status: true,
                 data:data,

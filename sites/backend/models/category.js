@@ -9,15 +9,22 @@ export default {
         const rows = await db.query(sql);
         return rows;
     },
+
+    //
+    getAllCategoriesCount: async (searchCriteria,options,offset) => {
+        const sql = `SELECT count(*) as count FROM categories 
+            WHERE category_name LIKE '%${searchCriteria.category_name}%' 
+            Limit ${options.limit} offset ${offset}`;
+        const rows = await db.query(sql);
+        return rows;
+    },
     
     // 
     createCategory: async (dataObj) => {
         const fields = Object.keys(dataObj);
         const values = fields.map((field) => `'${dataObj[field]}'`).join(',');
         const sql = `INSERT INTO categories (${fields.join(',')}) VALUES (${values})`;
-        console.log(sql);
         const rows = await db.query(sql);
-        console.log(rows);
 
         return rows.insertId;
     },
