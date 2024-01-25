@@ -3,24 +3,25 @@ import db from './dbConnection.js';
 export default {
 
     // 
-    getAllTemplates: async (searchCriteria,options,offset) => {
+    getAllTemplates: async (searchCriteria,options,offset,condition) => {
         const sql = `SELECT t.*, c.category_name FROM templates as t
                     left join categories as c
                     on t.category_id = c.category_id 
                     WHERE t.template_name LIKE '%${searchCriteria.template_name}%'
+                    ${condition}
                     order by t.template_id desc
                     Limit ${options.limit} offset ${offset}`;
-        console.log('getAllTemplates : ',sql)
         const rows = await db.query(sql);
         return rows;
     },
     
     //
-    getAllTemplatesCount: async (searchCriteria) => {
+    getAllTemplatesCount: async (searchCriteria,condition) => {
         const sql = `SELECT count(*) as count FROM templates as t
                     left join categories as c
                     on t.category_id = c.category_id 
-                    WHERE t.template_name LIKE '%${searchCriteria.template_name}%'`
+                    WHERE t.template_name LIKE '%${searchCriteria.template_name}%'
+                     ${condition}`
         const rows = await db.query(sql);
         return rows;
     },

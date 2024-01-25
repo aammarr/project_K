@@ -42,7 +42,7 @@ export default {
     // Get all templates
     getAllTemplates: async (req, res) => {
         try {
-            const { page = 1, limit = 10, search = '' } = req.query;
+            const { category_id = '', page = 1, limit = 10, search = '' } = req.query;
             const tableName = 'templates';
 
             const options = {
@@ -53,13 +53,17 @@ export default {
 
             // Define the search criteria using the search variable
             const searchCriteria = {
+                category_id: category_id,
                 template_name: search, // Use the search variable here
             };
+            let condition = ``;
+            if (category_id) {
+                condition = condition + ' and t.category_id = '+searchCriteria.category_id;
+            }
 
             // Get the count based on both search criteria and overall criteria
-            const totalCount = await template.getAllTemplatesCount(searchCriteria);
-
-            const data = await template.getAllTemplates(searchCriteria, options, offset);
+            const totalCount = await template.getAllTemplatesCount(searchCriteria,condition);
+            const data = await template.getAllTemplates(searchCriteria, options, offset,condition);
            
             // Calculate next and previous page numbers based on the filtered count
             const totalPages = Math.ceil(totalCount[0].count / options.limit);

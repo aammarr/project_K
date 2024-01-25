@@ -2,12 +2,28 @@ import auth from "../middleware/auth.js";
 import userController from '../controller/userController.js';
 import categoryController from '../controller/categoryController.js';
 import dashboardController from '../controller/dashboardController.js';
+import templateController from "../controller/templateController.js";
 import Router from "express";
 
 const router = Router.Router();
 const { adminLogin, getUser, getAllUsers, updateUser } = userController;
 const { dashboardCount } = dashboardController;
 const { createCategory, getCategories, getCategoryById, updateCategoryById, deleteCategoryById } = categoryController;
+const {
+  createTemplate,
+  getAllTemplates,
+  getTemplateById,
+  updateTemplateById,
+  deleteTemplateById,
+//   getAllTemplatesByCategoryId,
+//   getUploadId,
+//   getSignedUrlMultipPart,
+//   fileSaveIntoDb,
+//   completeMultipartUpload,
+//   getPutSignedUrl,
+//   getDownloadUrl,
+} = templateController;
+
 // login 
 router.post("/login", adminLogin);
 
@@ -29,6 +45,12 @@ router.put("/category/:id", auth, updateCategoryById);
 router.delete("/category/:id", auth, deleteCategoryById);
 
 // templates
+// router.get("/category/:category_id", auth, getAllTemplatesByCategoryId);
+router.get("/templates/", getAllTemplates);
+router.post("/", auth, createTemplate);
+router.get("/template/:id", auth, getTemplateById);
+router.put("/template/:id", auth, updateTemplateById);
+router.delete("/template/:id", auth, deleteTemplateById);
 
 
 
