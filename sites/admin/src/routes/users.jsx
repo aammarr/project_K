@@ -45,7 +45,7 @@ const Users = () => {
     try {
       setLoading(true)
       const response = await axiosInstance.get(
-        `user/?page=${currentPage}&limit=${limit}&search=${searchText ? searchText : ''}`,
+        `admin/users/?page=${currentPage}&limit=${limit}&search=${searchText ? searchText : ''}`,
       )
       setUsers(response?.data?.data)
       setTotalPages(response?.data?.pagination?.totalPages)

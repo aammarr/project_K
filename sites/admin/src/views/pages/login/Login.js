@@ -46,12 +46,13 @@ const Login = () => {
       }
       setLoading(true)
       // Make sure to replace 'YOUR_API_ENDPOINT' with the actual endpoint
-      const response = await axios.post(`${process.env.REACT_APP_BASE_URL}user/login`, {
+      const response = await axios.post(`${process.env.REACT_APP_BASE_URL}admin/login`, {
         email,
         password,
       })
 
       const userData = response.data.data
+      console.log(userData)
 
       // Save data to local storage
       localStorage.setItem('user_id', userData.user_id)
