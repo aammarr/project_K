@@ -75,7 +75,7 @@ const Templates = () => {
     try {
       setLoading(true)
       const response = await axiosInstance.get(
-        `template?page=${currentPage}&limit=${limit}&search=${searchText ? searchText : ''}`,
+        `admin/templates?page=${currentPage}&limit=${limit}&search=${searchText ? searchText : ''}`,
       )
       setTemplates(response?.data?.data)
       setTotalPages(response?.data?.pagination?.totalPages)
@@ -105,7 +105,7 @@ const Templates = () => {
     try {
       await axiosInstance.delete(`template/${selectedTemplateId}`)
       const response = await axiosInstance.get(
-        `template?page=${currentPage}&limit=${limit}&search=${searchText ? searchText : ''}`,
+        `admin/templates?page=${currentPage}&limit=${limit}&search=${searchText ? searchText : ''}`,
       )
       setTemplates(response?.data?.data)
       setShowDeleteModal(false)

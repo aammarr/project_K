@@ -94,7 +94,7 @@ const UpdateTemplate = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axiosInstance.get('category?page=1&limit=10000&search=')
+        const response = await axiosInstance.get('admin/categories?page=1&limit=10000&search=')
         setCategories(response?.data?.data)
       } catch (error) {
         console.error('Error fetching categories:', error)
@@ -254,7 +254,7 @@ const UpdateTemplate = () => {
   const fetchData = async () => {
     try {
       // Fetch template data using the provided template ID
-      const response = await axiosInstance.get(`template/${id}`)
+      const response = await axiosInstance.get(`admin/template/${id}`)
       const templateData = response?.data?.data
 
       // Set the form fields with the retrieved data
@@ -314,7 +314,7 @@ const UpdateTemplate = () => {
         requestBody.template_url = templateUrl
       }
 
-      await axiosInstance.put(`template/${id}`, requestBody)
+      await axiosInstance.put(`admin/template/${id}`, requestBody)
 
       toast.success('Template updated successfully', { position: toast.POSITION.TOP_RIGHT })
       setEditable(false) // Turn off edit mode after updating

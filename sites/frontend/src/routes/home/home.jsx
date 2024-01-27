@@ -8,6 +8,9 @@ import { toast } from "react-toastify";
 import Pagination from "@mui/material/Pagination";
 import CircularProgress from "@mui/material/CircularProgress"; // Import CircularProgress
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { Modal, Box, Typography, Button, IconButton } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 
 const Home = () => {
   const [templates, setTemplates] = useState([]);
@@ -19,7 +22,18 @@ const Home = () => {
   const [totalItems, setTotalItems] = useState(0);
   const [categories, setCategories] = useState([]);
   const [categoryId, setCategoryId] = useState("");
+  const [showLoginModal, setShowLoginModal] = useState(false); // State for modal visibility
 
+  const navigate = useNavigate(); // Initialize useNavigate
+  const user = useSelector((state) => state.user.user);
+
+  const handleCardClick = (templateId) => {
+    // Navigate to template-details route and pass the templateId as a parameter
+    console.log("clicked");
+    if (user) {
+      navigate("/template-details", { state: { templateId } });
+    } else setShowLoginModal(true); // Show the login modal
+  };
   // Function to fetch categories
   const fetchCategories = async () => {
     try {
@@ -76,7 +90,7 @@ const Home = () => {
     try {
       setLoading(true);
       const response = await axiosInstance.get(
-        `template?page=${currentPage}&limit=${limit}&search=${
+        `template?category_id=${categoryId}&page=${currentPage}&limit=${limit}&search=${
           searchText ? searchText : ""
         }`
       );
@@ -99,7 +113,7 @@ const Home = () => {
     <div className="container-fluid">
       <div className="row">
         {/* Left Container (1/4th size) */}
-        <div className="col-lg-2 mt-5">
+        <div className="col-lg-2" style={{ marginTop: "105px" }}>
           <CategoriesList
             categories={categories}
             onCategoryClick={handleCategoryClick}
@@ -116,7 +130,7 @@ const Home = () => {
                 <input
                   type="text"
                   className="form-control"
-                  placeholder="Search cards..."
+                  placeholder="Search templates..."
                   onChange={handleInputChange}
                   onKeyDown={handleKeyPress}
                 />
@@ -146,6 +160,7 @@ const Home = () => {
                       description={template?.template_description}
                       category={template?.category_name}
                       uploadTime={convertDateFormat(template?.created_at)}
+                      onClick={() => handleCardClick(template.template_id)}
                     />
                   ))}
 
@@ -164,6 +179,47 @@ const Home = () => {
           )}
         </div>
       </div>
+      <Modal open={showLoginModal} onClose={() => setShowLoginModal(false)}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 300,
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 2,
+            textAlign: "center",
+          }}
+        >
+          <IconButton
+            aria-label="close"
+            sx={{ position: "absolute", right: 0, top: 0 }}
+            onClick={() => setShowLoginModal(false)}
+          >
+            <CloseIcon />
+          </IconButton>
+          <Typography
+            variant="h6"
+            gutterBottom
+            style={{ padding: "70px 10px" }}
+          >
+            Please login or Signup to view this template!
+          </Typography>
+          <Button
+            variant="contained"
+            sx={{ mr: 1 }}
+            onClick={() => navigate("/login")}
+          >
+            Login
+          </Button>
+
+          <Button variant="contained" onClick={() => navigate("/sign-up")}>
+            Sign up
+          </Button>
+        </Box>
+      </Modal>
     </div>
   );
 };

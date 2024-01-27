@@ -87,7 +87,7 @@ const AddTemplate = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axiosInstance.get('category?page=1&limit=10000&search=')
+        const response = await axiosInstance.get('admin/categories?page=1&limit=10000&search=')
         setCategories(response?.data?.data)
       } catch (error) {
         console.error('Error fetching categories:', error)

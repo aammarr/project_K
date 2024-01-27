@@ -79,7 +79,7 @@ const Signup = () => {
 
           {/* Right container with signup form */}
           <div className="right-container-signup">
-            <h1>Slideboom</h1>
+            <h1>Slidebloom</h1>
             <h2>Sign Up</h2>
 
             {/* Signup form */}

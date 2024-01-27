@@ -60,7 +60,7 @@ const Dashboard = () => {
   useEffect(() => {
     const getStats = async () => {
       try {
-        const { data } = await axiosInstance.get('dashboard/stats')
+        const { data } = await axiosInstance.get('admin/dashboard/stats')
         setStats(data?.data)
       } catch (error) {
         console.log(error)

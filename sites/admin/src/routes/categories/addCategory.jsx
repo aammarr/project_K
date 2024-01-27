@@ -33,7 +33,7 @@ const AddCategory = () => {
 
       setLoading(true)
 
-      const response = await axiosInstance.post('category', {
+      const response = await axiosInstance.post('admin/category', {
         category_name: categoryName,
         category_description: categoryDescription,
         category_code: categoryCode,

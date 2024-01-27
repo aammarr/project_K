@@ -64,7 +64,7 @@ const Login = () => {
 
           {/* Right container with login form */}
           <div className="right-container">
-            <h1>Slideboom</h1>
+            <h1>Slidebloom</h1>
             <h2>Login</h2>
 
             {/* Login form */}

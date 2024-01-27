@@ -9,9 +9,14 @@ const ResponsiveCard = ({
   description,
   category,
   uploadTime,
+  onClick,
 }) => {
   return (
-    <Link to="/details" className="card-link mb-4" style={{ width: "350px" }}>
+    <div
+      className="card-link mb-4"
+      style={{ width: "350px" }}
+      onClick={onClick}
+    >
       <div className="card">
         <img
           src={imgSrc || "images/no-image.jpg"}
@@ -20,7 +25,7 @@ const ResponsiveCard = ({
         />
         <div className="card-body">
           <h5 className="card-title">{title}</h5>
-          <p className="card-text">{description}</p>
+          <p className="card-text">{description.substring(0, 25) + "..."}</p>
         </div>
         <div className="card-footer d-flex justify-content-between align-items-center">
           {/* Badge as a chip for category */}
@@ -31,7 +36,7 @@ const ResponsiveCard = ({
           </div>
         </div>
       </div>
-    </Link>
+    </div>
   );
 };
 

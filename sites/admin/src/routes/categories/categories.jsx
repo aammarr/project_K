@@ -51,7 +51,9 @@ const Categories = () => {
     try {
       setLoading(true)
       const response = await axiosInstance.get(
-        `category?page=${currentPage}&limit=${limit}&search=${searchText ? searchText : ''}`,
+        `admin/categories?page=${currentPage}&limit=${limit}&search=${
+          searchText ? searchText : ''
+        }`,
       )
       setCategories(response?.data?.data)
       setTotalPages(response?.data?.pagination?.totalPages)
@@ -81,9 +83,9 @@ const Categories = () => {
 
   const handleDeleteConfirmation = async () => {
     try {
-      await axiosInstance.delete(`category/${selectedCategoryId}`)
+      await axiosInstance.delete(`admin/category/${selectedCategoryId}`)
       const response = await axiosInstance.get(
-        `category?page=${currentPage}&limit=10&search=${searchText}`,
+        `admin/categories?page=${currentPage}&limit=10&search=${searchText}`,
       )
       setCategories(response?.data?.data)
       setShowDeleteModal(false)

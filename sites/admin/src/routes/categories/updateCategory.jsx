@@ -32,7 +32,7 @@ const UpdateCategory = () => {
     const fetchCategoryDetails = async () => {
       try {
         setLoading(true)
-        const response = await axiosInstance.get(`category/${id}`)
+        const response = await axiosInstance.get(`admin/category/${id}`)
         const categoryDetails = response.data.data
 
         setCategoryName(categoryDetails.category_name)
@@ -63,7 +63,7 @@ const UpdateCategory = () => {
 
       setLoading(true)
 
-      const response = await axiosInstance.put(`category/${id}`, {
+      const response = await axiosInstance.put(`admin/category/${id}`, {
         category_name: categoryName,
         category_description: categoryDescription,
         category_code: categoryCode,
