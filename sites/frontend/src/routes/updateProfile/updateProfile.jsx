@@ -18,6 +18,11 @@ const UpdateProfile = () => {
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    if (!user) {
+      window.location = "../";
+    }
+  }, [user]);
   const navigate = useNavigate();
   const handleUpdateProfile = async () => {
     try {

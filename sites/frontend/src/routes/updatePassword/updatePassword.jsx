@@ -1,5 +1,5 @@
 // UpdatePassword.js
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import axiosInstance from "../../axios/axiosConfig";
@@ -18,6 +18,12 @@ const UpdatePassword = () => {
   const user = useSelector((state) => state.user.user);
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!user) {
+      window.location = "../";
+    }
+  }, [user]);
 
   const handleUpdatePassword = async () => {
     try {
