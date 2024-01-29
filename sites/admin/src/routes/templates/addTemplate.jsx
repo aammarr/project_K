@@ -10,6 +10,7 @@ import {
   CFormInput,
   CFormLabel,
   CFormSelect,
+  CFormTextarea,
   CRow,
   CSpinner,
 } from '@coreui/react'
@@ -325,12 +326,13 @@ const AddTemplate = () => {
               />
 
               <CFormLabel htmlFor="templateDescription">Template Description</CFormLabel>
-              <CFormInput
+              <CFormTextarea
                 type="text"
                 id="templateDescription"
                 placeholder="Enter template description"
                 value={templateDescription}
                 onChange={(e) => setTemplateDescription(e.target.value)}
+                rows={7}
               />
 
               <CFormLabel htmlFor="templateCode">Template Code</CFormLabel>

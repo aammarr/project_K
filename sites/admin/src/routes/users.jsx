@@ -18,6 +18,7 @@ import {
   CTableHead,
   CTableHeaderCell,
   CTableRow,
+  CBadge,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilSearch, cilPeople } from '@coreui/icons'
@@ -150,8 +151,8 @@ const Users = () => {
                         <CTableHeaderCell>User</CTableHeaderCell>
                         <CTableHeaderCell>Email</CTableHeaderCell>
                         <CTableHeaderCell>Phone</CTableHeaderCell>
-                        <CTableHeaderCell>City</CTableHeaderCell>
-                        <CTableHeaderCell>Country</CTableHeaderCell>
+                        <CTableHeaderCell>Subscription</CTableHeaderCell>
+                        <CTableHeaderCell>Expiry Date</CTableHeaderCell>
                       </CTableRow>
                     </CTableHead>
                     <CTableBody>
@@ -175,12 +176,13 @@ const Users = () => {
                             <CTableDataCell>{user.email}</CTableDataCell>{' '}
                             <CTableDataCell>{user.phone}</CTableDataCell>
                             <CTableDataCell>
-                              {/* <CIcon size="xl" icon={user.country} title={user.country} /> */}
-                              {user.city}
+                              <CBadge color={user?.subscribed === '1' ? 'success' : 'danger'}>
+                                {user?.subscribed === '1' ? 'Subscribed' : 'Unsubscribed'}
+                              </CBadge>
                             </CTableDataCell>
                             <CTableDataCell>
                               {/* <CIcon size="xl" icon={user.country} title={user.country} /> */}
-                              {user.country}
+                              {user?.subscription_expire ? user.subscription_expire : 'N/A'}
                             </CTableDataCell>
                           </CTableRow>
                         ))}

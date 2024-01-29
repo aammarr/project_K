@@ -10,6 +10,7 @@ import {
   CFormInput,
   CFormLabel,
   CFormSelect,
+  CFormTextarea,
   CRow,
   CSpinner,
 } from '@coreui/react'
@@ -380,13 +381,14 @@ const UpdateTemplate = () => {
               />
 
               <CFormLabel htmlFor="templateDescription">Template Description</CFormLabel>
-              <CFormInput
+              <CFormTextarea
                 type="text"
                 id="templateDescription"
                 placeholder="Enter template description"
                 value={templateDescription}
                 onChange={(e) => setTemplateDescription(e.target.value)}
-                disabled={!editable} // Set the "disabled" attribute based on the "editable" state
+                disabled={!editable}
+                rows={7} // Set the "disabled" attribute based on the "editable" state
               />
 
               <CFormLabel htmlFor="templateCode">Template Code</CFormLabel>
