@@ -6,6 +6,8 @@ import "./updateProfile.scss";
 import axiosInstance from "../../axios/axiosConfig";
 import CircularProgress from "@mui/material/CircularProgress";
 import { useEffect } from "react";
+import { setUser } from "../../actions/userActions";
+import { useNavigate } from "react-router-dom";
 
 const UpdateProfile = () => {
   const user = useSelector((state) => state.user.user);
@@ -15,6 +17,8 @@ const UpdateProfile = () => {
   const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
+
+  const navigate = useNavigate();
   const handleUpdateProfile = async () => {
     try {
       if (!firstName || !lastName || !phone) {
@@ -32,7 +36,13 @@ const UpdateProfile = () => {
         phone,
       });
 
-      if (response) toast.success("Profile updated successfully");
+      if (response) {
+        const userData = response?.data?.data;
+        dispatch(setUser(userData));
+        toast.success("Profile updated successfully");
+
+        navigate("../");
+      }
     } catch (error) {
       toast.error("Profile update failed. Please check your credentials.");
       console.error("Profile update error:", error);

@@ -7,7 +7,7 @@ import { logoutUser } from "../../actions/userActions";
 import { toast } from "react-toastify";
 import { IconButton, Menu, MenuItem } from "@mui/material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import UpdateIcon from "@mui/icons-material/Update";
+import PersonIcon from "@mui/icons-material/Person";
 import LockIcon from "@mui/icons-material/Lock";
 import LogoutIcon from "@mui/icons-material/Logout";
 
@@ -42,7 +42,7 @@ const Header = () => {
         Slidebloom{" "}
       </Link>
       <div className="nav-links">
-        <Link to="/premium-plans" className="mr-3">
+        <Link to="/premium-plans" className="mr-3 premium-plan">
           Premium Plans
         </Link>
 
@@ -65,8 +65,8 @@ const Header = () => {
                 <strong>{user.first_name + " " + user.last_name} </strong>
               </div>
               <MenuItem onClick={() => navigate("/update-profile")}>
-                <UpdateIcon style={{ marginRight: "10px" }} />
-                <span>Update Profile</span>
+                <PersonIcon style={{ marginRight: "10px" }} />
+                <span>Profile</span>
               </MenuItem>
               <MenuItem onClick={() => navigate("/update-password")}>
                 <LockIcon style={{ marginRight: "10px" }} />

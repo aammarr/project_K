@@ -11,7 +11,7 @@ const Footer = () => {
         <div className="row">
           <div className="col-lg-12 text-center">
             <p>&copy; {currentYear} Slidebloom. All rights reserved.</p>
-            <p>
+            <p style={{ fontSize: "12px" }}>
               Designed and developed by{" "}
               <a href="https://adateck.com" style={{ textDecoration: "none" }}>
                 Adateck

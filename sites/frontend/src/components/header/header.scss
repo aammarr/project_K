@@ -19,6 +19,13 @@
     align-items: center;
     justify-content: flex-end;
 
+    .premium-plan {
+      color: rgb(188 89 18) !important;
+      &:hover {
+        color: red !important;
+      }
+    }
+
     a {
       color: black; // Text color for the links
       text-decoration: none; // Remove default text decoration

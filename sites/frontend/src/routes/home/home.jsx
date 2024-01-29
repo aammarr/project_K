@@ -9,8 +9,7 @@ import Pagination from "@mui/material/Pagination";
 import CircularProgress from "@mui/material/CircularProgress"; // Import CircularProgress
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
-import { Modal, Box, Typography, Button, IconButton } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
+import { makeStyles } from "@mui/material/styles";
 
 const Home = () => {
   const [templates, setTemplates] = useState([]);
@@ -30,9 +29,7 @@ const Home = () => {
   const handleCardClick = (templateId) => {
     // Navigate to template-details route and pass the templateId as a parameter
     console.log("clicked");
-    if (user) {
-      navigate("/template-details", { state: { templateId } });
-    } else setShowLoginModal(true); // Show the login modal
+    navigate("/template-details", { state: { templateId } });
   };
   // Function to fetch categories
   const fetchCategories = async () => {
@@ -113,7 +110,7 @@ const Home = () => {
     <div className="container-fluid">
       <div className="row">
         {/* Left Container (1/4th size) */}
-        <div className="col-lg-2" style={{ marginTop: "105px" }}>
+        <div className="col-lg-2 mt-5 pt-1">
           <CategoriesList
             categories={categories}
             onCategoryClick={handleCategoryClick}
@@ -125,7 +122,6 @@ const Home = () => {
           <div className="row mb-3">
             {/* Search Box with Heading */}
             <div className="col-lg-6 offset-lg-3">
-              <h2 className="mb-3 text-center">Search Templates</h2>
               <div className="input-group">
                 <input
                   type="text"
@@ -151,8 +147,7 @@ const Home = () => {
               <div className="row">
                 {/* Cards */}
 
-                {templates &&
-                  templates?.length !== 0 &&
+                {templates && templates?.length !== 0 ? (
                   templates.map((template) => (
                     <ResponsiveCard
                       imgSrc={template?.template_thumbnail}
@@ -162,64 +157,37 @@ const Home = () => {
                       uploadTime={convertDateFormat(template?.created_at)}
                       onClick={() => handleCardClick(template.template_id)}
                     />
-                  ))}
+                  ))
+                ) : (
+                  <div
+                    style={{
+                      fontSize: "20px",
+                      textAlign: "center",
+                      marginTop: "20px",
+                    }}
+                  >
+                    {" "}
+                    No Templates Found
+                  </div>
+                )}
 
                 {/* Add more ResponsiveCard components here with 10px spacing */}
               </div>
-              <div>
-                <Pagination
-                  count={totalPages}
-                  color="primary"
-                  onChange={handlePageChange}
-                  page={currentPage}
-                  size="large"
-                />
-              </div>
+              {templates?.length !== 0 && (
+                <div>
+                  <Pagination
+                    count={totalPages}
+                    color="primary"
+                    onChange={handlePageChange}
+                    page={currentPage}
+                    size="large"
+                  />
+                </div>
+              )}
             </>
           )}
         </div>
       </div>
-      <Modal open={showLoginModal} onClose={() => setShowLoginModal(false)}>
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 300,
-            bgcolor: "background.paper",
-            boxShadow: 24,
-            p: 2,
-            textAlign: "center",
-          }}
-        >
-          <IconButton
-            aria-label="close"
-            sx={{ position: "absolute", right: 0, top: 0 }}
-            onClick={() => setShowLoginModal(false)}
-          >
-            <CloseIcon />
-          </IconButton>
-          <Typography
-            variant="h6"
-            gutterBottom
-            style={{ padding: "70px 10px" }}
-          >
-            Please login or Signup to view this template!
-          </Typography>
-          <Button
-            variant="contained"
-            sx={{ mr: 1 }}
-            onClick={() => navigate("/login")}
-          >
-            Login
-          </Button>
-
-          <Button variant="contained" onClick={() => navigate("/sign-up")}>
-            Sign up
-          </Button>
-        </Box>
-      </Modal>
     </div>
   );
 };
