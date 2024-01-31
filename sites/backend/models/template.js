@@ -62,7 +62,7 @@ export default {
         return rows;
     },
 
-    // 
+    // Function createTemplate
     createTemplate: async (dataObj) => {
         const fields = Object.keys(dataObj);
         const values = fields.map((field) => `'${dataObj[field]}'`).join(',');
@@ -72,7 +72,7 @@ export default {
         return rows.insertId;
     },
 
-    //
+    // Function getTemplateById
     getTemplateById: async (template_id) =>{
         
         const sql = `SELECT t.*, c.category_name FROM templates as t

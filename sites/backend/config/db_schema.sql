@@ -23,5 +23,10 @@ CREATE TABLE `project_k`.`categories` (
 -- Templates Table Schema
 
 CREATE TABLE `project_k`.`templates` (
-    `template_id` INT NOT NULL AUTO_INCREMENT, `user_id` VARCHAR(255) NULL, `category_id` VARCHAR(255) NULL, `template_code` VARCHAR(255) NULL, `template_name` VARCHAR(255) NULL, `template_description` VARCHAR(255) NULL, `template_type` VARCHAR(255) NULL, `template_size` VARCHAR(255) NULL, `template_key` VARCHAR(255) NULL, `template_url` VARCHAR(255) NULL, `template_thumbnail` VARCHAR(255) NULL, `template_view_count` INT NULL, `template_download_count` INT NULL, `template_flag` VARCHAR(255) NULL, `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP, `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY (`template_id`)
+    `template_id` INT NOT NULL AUTO_INCREMENT, `user_id` VARCHAR(255) NULL, `category_id` VARCHAR(255) NULL, `template_code` VARCHAR(255) NULL, `template_name` VARCHAR(255) NULL, `template_description` LONGTEXT NULL, `template_type` VARCHAR(255) NULL, `template_size` VARCHAR(255) NULL, `template_key` VARCHAR(255) NULL, `template_url` LONGTEXT NULL, `template_thumbnail` VARCHAR(255) NULL, `template_view_count` INT NULL, `template_download_count` INT NULL, `template_flag` VARCHAR(255) NULL, `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP, `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY (`template_id`)
+);
+
+-- Pictures Table Schema
+CREATE TABLE `project_k`.`pictures` (
+    `picture_id` INT NOT NULL AUTO_INCREMENT, `template_id` INT, `picture_url` VARCHAR(255) NULL, `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP, `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY (`picture_id`)
 );

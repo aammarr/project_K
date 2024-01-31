@@ -1,4 +1,5 @@
 import template from "../models/template.js";
+import picture from "../models/picture.js";
 import AWS from 'aws-sdk';
 import moment from 'moment';
 import awsService from '../services/aws.js';
@@ -18,7 +19,7 @@ export default {
         try {
 
             const { category_id, template_code, template_name, template_description,
-                template_key, template_size,template_type,template_url,template_thumbnail
+                template_key, template_size,template_type,template_url,template_thumbnail, template_multiple_thumbnails
             } = req.body;
 
             const user_id = req?.user.userId;
@@ -28,10 +29,20 @@ export default {
               return res.status(401).send({ status: false, message: 'Template name, Template Description & Template URL is required' });
             }
 
-            await template.createTemplate({user_id, category_id,template_code, template_name, template_description,
+            let a = template_multiple_thumbnails
+            let parsedArray = JSON.parse(a);
+           
+            let template_id = await template.createTemplate({user_id, category_id,template_code, template_name, template_description,
                 template_key, template_size,template_type,template_url, template_thumbnail, 
                 template_view_count, template_download_count
             });
+            for (let i = 0; i < parsedArray.length; i++) {
+                let obj = {
+                    template_id:template_id,
+                    picture_url:parsedArray[i]
+                };
+                await picture.createPicture(obj);
+            }
     
             return res.status(200).send({ status: true, message: 'Template created successfully' });
         } catch (error) {
@@ -138,6 +149,9 @@ export default {
             if (!foundTemplate) {
                 return res.status(404).send({ status: false, data:{}, message: 'Template not found' });
             }
+            const multipleThumbnails = await picture.getPicturesByTemplateId(templateId);
+            foundTemplate.template_multiple_thumbnails = multipleThumbnails;
+
             let viewCount = foundTemplate.template_view_count+1;
             await template.updateTemplateById(foundTemplate.template_id,{"template_view_count":viewCount});
 

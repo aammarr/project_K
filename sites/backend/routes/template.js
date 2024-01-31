@@ -34,9 +34,9 @@ router.post("/file-save-into-db", fileSaveIntoDb);
 router.get("/getSignedUrlDownload", getDownloadUrl);
 
 router.get("/", getAllTemplates);
-router.get("/category/:category_id", auth, getAllTemplatesByCategoryId);
+router.get("/category/:category_id",  getAllTemplatesByCategoryId);
 router.post("/", auth, createTemplate);
-router.get("/:id", auth, getTemplateById);
+router.get("/:id", getTemplateById);
 router.put("/:id", auth, updateTemplateById);
 router.delete("/:id", auth, deleteTemplateById);
 
