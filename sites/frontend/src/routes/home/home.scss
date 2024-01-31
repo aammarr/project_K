@@ -4,26 +4,127 @@
   padding: 20px;
 }
 
-.row {
-  margin-right: -10px;
-  margin-left: -10px;
+.heading {
+  font-weight: bold;
+  font-size: 50px;
+  padding: 40px 300px;
+}
+.heading-subtext {
+  padding: 0 450px;
+}
+.home-button {
+  padding: 10px 90px;
+  background-color: #e8ccf8;
+  color: black;
+  border: none;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #e1b8f8;
+  }
 }
 
-.col-lg-3,
-.col-lg-9 {
-  padding-right: 10px;
-  padding-left: 10px;
+.infiniteslide_wrap {
+  overflow: hidden;
 }
 
-.categories-list {
-  background-color: #f8f9fa;
-  padding: 20px;
-  border-radius: 5px;
-  margin-bottom: 20px;
+.h-scroll-bar {
+  display: flex;
+  flex-flow: row;
+  align-items: center;
+  animation: floatAnimation 228.928s linear infinite;
+}
+.h-scroll-bar-right {
+  display: flex;
+  flex-flow: row;
+  align-items: center;
+  animation: floatAnimationRight 228.928s linear infinite;
 }
 
-.categories-list h4 {
-  margin-bottom: 10px;
+.slide-wrapper {
+  position: relative;
+  display: inline-block;
+  margin-right: 5px;
+  margin-left: 5px;
+  flex: 0 0 auto;
+
+  .slide-image {
+    margin-top: 20px;
+    max-width: 450px;
+    height: 225px;
+    border: 1px solid black;
+    border-radius: 6px;
+    box-shadow: 1px 1px 8px #90a6af80;
+    margin-right: 5px;
+  }
 }
 
-/* Add any additional styling as needed */
+@keyframes floatAnimation {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-4578.564px, 0, 0);
+  }
+}
+
+@keyframes floatAnimationRight {
+  0% {
+    transform: translate3d(-3600.564px, 0, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@media only screen and (max-width: 1280px) {
+  .heading {
+    padding: 20px 150px;
+  }
+  .heading-subtext {
+    padding: 0 350px;
+  }
+}
+
+@media only screen and (max-width: 1024px) {
+  .heading {
+    padding: 20px 50px;
+  }
+  .heading-subtext {
+    padding: 0 230px;
+  }
+}
+@media only screen and (max-width: 767px) {
+  .heading {
+    padding: 20px 20px;
+    font-size: 42px;
+  }
+  .heading-subtext {
+    padding: 0 110px;
+  }
+}
+
+@media only screen and (max-width: 480px) {
+  .heading {
+    padding: 20px 0;
+    font-size: 35px;
+  }
+  .heading-subtext {
+    padding: 0 70px;
+  }
+
+  .slide-wrapper {
+    .slide-image {
+      max-width: 300px;
+      height: 150px;
+    }
+  }
+  @keyframes floatAnimationRight {
+    0% {
+      transform: translate3d(-3000.564px, 0, 0);
+    }
+    100% {
+      transform: translate3d(0, 0, 0);
+    }
+  }
+}

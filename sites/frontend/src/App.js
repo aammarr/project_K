@@ -9,6 +9,7 @@ import TemplateDetails from "./routes/templateDetails/templateDetails";
 import PremiumPlans from "./routes/premiumPlans/premiumPlans";
 import UpdatePassword from "./routes/updatePassword/updatePassword";
 import UpdateProfile from "./routes/updateProfile/updateProfile";
+import Collections from "./routes/collections/collections";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
       <Route path="/" element={<HeaderFooter />}>
         <Route index element={<Home />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/collections" element={<Collections />} />
         <Route path="/sign-up" element={<Signup />} />
         <Route path="/template-details" element={<TemplateDetails />} />
         <Route path="/premium-plans" element={<PremiumPlans />} />{" "}
