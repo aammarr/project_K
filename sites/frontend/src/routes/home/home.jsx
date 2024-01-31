@@ -2,6 +2,7 @@
 import React from "react";
 import "./home.scss";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -23,6 +24,9 @@ const Home = () => {
               onClick={() => navigate("/collections")}
             >
               START NOW
+              <ArrowForwardIcon
+                style={{ marginLeft: "10px", paddingBottom: "2px" }}
+              />
             </button>
           </div>
         </div>

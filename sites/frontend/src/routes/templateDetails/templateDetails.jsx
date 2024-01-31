@@ -8,6 +8,7 @@ import { useSelector } from "react-redux";
 import CircularProgress from "@mui/material/CircularProgress"; // Import CircularProgress
 import { Modal, Box, Typography, Button, IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import Slider from "react-slick";
 
 const TemplateDetails = () => {
   const location = useLocation();
@@ -64,6 +65,16 @@ const TemplateDetails = () => {
     );
     window.open(responseOne?.data?.data, "_blank");
   };
+
+  const settings = {
+    dots: true,
+    dotsClass: "slick-dots slick-thumb",
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+  };
+
   return (
     <>
       {loading ? (
@@ -77,12 +88,28 @@ const TemplateDetails = () => {
             <div className="row">
               {/* Left Container (3/4 size) */}
               <div className="col-md-7">
-                <img
+                <Slider {...settings}>
+                  <div>
+                    <img
+                      style={{ height: "500px", width: "100%" }}
+                      src={pageData.template_thumbnail || "images/no-image.jpg"}
+                      className="img-fluid rounded"
+                    />
+                  </div>
+                  <div>
+                    <img
+                      style={{ height: "500px", width: "100%" }}
+                      src={pageData.template_thumbnail || "images/no-image.jpg"}
+                      className="img-fluid rounded"
+                    />
+                  </div>
+                </Slider>
+                {/* <img
                   src={pageData.template_thumbnail || "images/no-image.jpg"} // Replace with the actual image source
                   alt="Template Image"
                   className="img-fluid rounded"
                   style={{ height: "500px", width: "100%" }}
-                />
+                /> */}
                 <div className="row mt-4">
                   <h1 className="fw-bold">{pageData.template_name}</h1>
                   <div className="d-flex justify-content-between align-items-center">
