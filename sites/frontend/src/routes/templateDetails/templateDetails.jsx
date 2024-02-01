@@ -135,6 +135,17 @@ const TemplateDetails = () => {
                   </div>
                   <h3 className="mt-4">Template Description</h3>
                   <p>{pageData.template_description}</p>
+                  <hr style={{ margin: "15px 0" }} />
+                  <div>
+                    <h2>Please note:</h2>
+                    <p>
+                      Downloads on mobile devices are not allowed. Because our
+                      files are large and need to be unzipped make sure to use a
+                      laptop or desktop computer. <br />
+                      Instant Download: Your files will be available to download
+                      once payment is confirmed.
+                    </p>
+                  </div>
                 </div>
               </div>
 

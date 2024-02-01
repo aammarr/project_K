@@ -24,7 +24,9 @@ const ResponsiveCard = ({
           alt="Card Image"
         />
         <div className="card-body">
-          <h5 className="card-title">{title}</h5>
+          <h5 className="card-title">
+            {title.length > 60 ? title.substring(0, 60) + "..." : title}
+          </h5>
           <p className="card-text">{description.substring(0, 25) + "..."}</p>
         </div>
         <div className="card-footer d-flex justify-content-between align-items-center">
