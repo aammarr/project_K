@@ -166,7 +166,7 @@ const TemplateDetails = () => {
                   <p>{pageData.template_description}</p>
                   <hr style={{ margin: "15px 0" }} />
                   <div>
-                    <h6>Please note:</h6>
+                    <strong>Please note:</strong>
                     <p>
                       Downloads on mobile devices are not allowed. Because our
                       files are large and need to be unzipped make sure to use a

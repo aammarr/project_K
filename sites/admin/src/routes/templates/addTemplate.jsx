@@ -43,42 +43,43 @@ const AddTemplate = () => {
   const [thumbnailProgress, setThumbnailProgress] = useState(0)
   const [multipleThumbnailProgress, setMultipleThumbnailProgress] = useState(0)
   const [multipleFiles, setMultipleFiles] = useState([])
+  const [finalFiles, setFinalFiles] = useState([])
 
   const [files, setFiles] = useState(null)
   const [fileArray, setFileArray] = useState([])
 
+  useEffect(() => {
+    const urlArray = multipleFiles.map((item) => item.url)
+
+    setFinalFiles(urlArray)
+  }, [multipleFiles])
+
   const handleAddFile = (event) => {
     event.preventDefault()
+
     if (fileArray.length < 9) {
-      setFileArray([...fileArray, null])
-      setMultipleFiles([...multipleFiles, null])
+      const fileId = uuidv4() // Generate a unique ID using uuid
+      setFileArray([...fileArray, { id: fileId, file: null }])
+      setMultipleFiles([...multipleFiles, { id: fileId, file: null }])
     }
   }
 
-  const handleRemoveFile = (event, index) => {
+  const handleRemoveFile = (event, id) => {
     event.preventDefault()
 
-    const newArray = [...fileArray]
-    const removedFile = newArray.splice(index, 1)[0]
+    // Remove the corresponding file entry from multipleFiles array
+    setMultipleFiles((prevFiles) => prevFiles.filter((file) => file.id !== id))
 
-    console.log(removedFile, index)
-
-    // Remove the corresponding file URL from multipleFiles array
-    setMultipleFiles((prevFiles) => {
-      const updatedFiles = [...prevFiles]
-      updatedFiles.splice(index, 1)
-      return updatedFiles
-    })
-
-    setFileArray(newArray)
+    // Remove the corresponding file entry from fileArray
+    setFileArray((prevArray) => prevArray.filter((file) => file.id !== id))
   }
 
-  const handleFileChange = async (index, event) => {
+  const handleFileChange = async (id, index, event) => {
     const file = event.target.files[0]
 
     setFileArray((prevArray) => {
       const updatedArray = [...prevArray]
-      updatedArray[index] = file
+      updatedArray[index] = { id, file } // Include id with the file in the array
       return updatedArray
     })
 
@@ -98,11 +99,11 @@ const AddTemplate = () => {
       // Update the multipleFiles array with the new URL at the specific index
       setMultipleFiles((prevFiles) => {
         const updatedFiles = [...prevFiles]
-        updatedFiles[index] = publicUrl
+        updatedFiles[index] = { id, url: publicUrl } // Include id with the URL in the array
         return updatedFiles
       })
 
-      // Update the fileArray with the new file
+      // You might want to handle other state updates or logic here
     } catch (error) {
       console.error('Error uploading file:', error.message)
       // Handle error as needed
@@ -160,6 +161,7 @@ const AddTemplate = () => {
 
   console.log(fileArray)
   console.log(multipleFiles)
+  console.log(finalFiles)
 
   // console.log(JSON.stringify(multipleFiles))
 
@@ -363,6 +365,10 @@ const AddTemplate = () => {
     }
   }
 
+  console.log(fileArray.some((file) => file?.file === null))
+
+  console.log(finalFiles.some((file) => file === undefined))
+
   const handleAddTemplate = async () => {
     console.log(progress)
     console.log('Adding template:', {
@@ -402,7 +408,7 @@ const AddTemplate = () => {
       //   return
       // }
 
-      const hasNullValues = fileArray.some((file) => file === null)
+      const hasNullValues = fileArray.some((file) => file?.file === null)
 
       if (hasNullValues) {
         toast.error('Please add all the images.', {
@@ -411,7 +417,7 @@ const AddTemplate = () => {
         return
       }
 
-      const hasNotUploaded = multipleFiles.some((file) => file === null)
+      const hasNotUploaded = finalFiles.some((file) => file === undefined)
 
       if (hasNotUploaded) {
         toast.error('Please wait for the images to upload', {
@@ -432,8 +438,8 @@ const AddTemplate = () => {
         template_multiple_thumbnails: '',
       }
 
-      if (multipleFiles?.length !== 0) {
-        requestBody.template_multiple_thumbnails = JSON.stringify(multipleFiles)
+      if (finalFiles?.length !== 0) {
+        requestBody.template_multiple_thumbnails = JSON.stringify(finalFiles)
       }
 
       // Include template_url only if it's not an empty string
@@ -594,21 +600,18 @@ const AddTemplate = () => {
               <CFormLabel htmlFor="file">Add More Thumbnails</CFormLabel>
 
               <div>
-                {fileArray.map((file, index) => {
-                  console.log(file)
-                  return (
-                    <div key={index} style={{ display: 'flex', marginBottom: '10px' }}>
-                      <CFormInput
-                        type="file"
-                        onChange={(event) => handleFileChange(index, event)}
-                      />
-                      <RemoveCircleOutlineIcon
-                        onClick={(event) => handleRemoveFile(event, index)}
-                        style={{ marginLeft: '10px', cursor: 'pointer', marginTop: '5px' }}
-                      />
-                    </div>
-                  )
-                })}
+                {fileArray.map((file, index) => (
+                  <div key={file?.id} style={{ display: 'flex', marginBottom: '10px' }}>
+                    <CFormInput
+                      type="file"
+                      onChange={(event) => handleFileChange(file?.id, index, event)}
+                    />
+                    <RemoveCircleOutlineIcon
+                      onClick={(event) => handleRemoveFile(event, file?.id)}
+                      style={{ marginLeft: '10px', cursor: 'pointer', marginTop: '5px' }}
+                    />
+                  </div>
+                ))}
                 {fileArray.length < 9 && (
                   <AddCircleOutlineIcon onClick={handleAddFile} style={{ cursor: 'pointer' }} />
                 )}
