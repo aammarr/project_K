@@ -1,5 +1,3 @@
-/* eslint-disable prettier/prettier */
-
 import axios from 'axios'
 
 // Create an instance of axios with common configuration

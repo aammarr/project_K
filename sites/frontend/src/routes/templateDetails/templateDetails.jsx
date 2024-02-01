@@ -9,6 +9,7 @@ import CircularProgress from "@mui/material/CircularProgress"; // Import Circula
 import { Modal, Box, Typography, Button, IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import Slider from "react-slick";
+import ImageGallery from "react-image-gallery";
 
 const TemplateDetails = () => {
   const location = useLocation();
@@ -19,6 +20,39 @@ const TemplateDetails = () => {
   const [loading, setLoading] = useState(true); // State to track loading
   const [showLoginModal, setShowLoginModal] = useState(false); // State for modal visibility
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false); // State for modal visibility
+  const [imagesArray, setImagesArray] = useState([]);
+
+  useEffect(() => {
+    // Update the imagesArray when pageData changes
+    const updateImagesArray = () => {
+      if (pageData?.template_multiple_thumbnails?.length !== 0) {
+        const newImagesArray = [
+          {
+            original: pageData.template_thumbnail || "images/no-image.jpg",
+            thumbnail: pageData.template_thumbnail || "images/no-image.jpg",
+          },
+          ...pageData.template_multiple_thumbnails.map((el) => ({
+            original: el.picture_url || "images/no-image.jpg",
+            thumbnail: el.picture_url || "images/no-image.jpg",
+          })),
+        ];
+
+        setImagesArray(newImagesArray);
+      } else {
+        const newImagesArray = [
+          {
+            original: pageData.template_thumbnail || "images/no-image.jpg",
+            thumbnail: pageData.template_thumbnail || "images/no-image.jpg",
+          },
+        ];
+
+        setImagesArray(newImagesArray);
+      }
+    };
+
+    // Call the function when the component mounts and whenever pageData changes
+    if (pageData) updateImagesArray();
+  }, [pageData]);
 
   const user = useSelector((state) => state.user.user);
   console.log(user);
@@ -84,26 +118,20 @@ const TemplateDetails = () => {
         </div>
       ) : (
         pageData && (
-          <div className="container-fluid mt-4 p-5">
+          <div className="container-fluid p-5">
             <div className="row">
               {/* Left Container (3/4 size) */}
               <div className="col-md-7">
-                <Slider {...settings}>
-                  <div>
-                    <img
-                      style={{ height: "500px", width: "100%" }}
-                      src={pageData.template_thumbnail || "images/no-image.jpg"}
-                      className="img-fluid rounded"
-                    />
-                  </div>
-                  <div>
-                    <img
-                      style={{ height: "500px", width: "100%" }}
-                      src={pageData.template_thumbnail || "images/no-image.jpg"}
-                      className="img-fluid rounded"
-                    />
-                  </div>
-                </Slider>
+                {imagesArray?.length !== 0 ? (
+                  <ImageGallery items={imagesArray} />
+                ) : (
+                  <img
+                    src={pageData.template_thumbnail || "images/no-image.jpg"} // Replace with the actual image source
+                    alt="Template Image"
+                    className="img-fluid rounded"
+                    style={{ height: "500px", width: "100%" }}
+                  />
+                )}
                 {/* <img
                   src={pageData.template_thumbnail || "images/no-image.jpg"} // Replace with the actual image source
                   alt="Template Image"
@@ -133,11 +161,12 @@ const TemplateDetails = () => {
                       {pageData?.template_download_count}
                     </div>
                   </div>
-                  <h3 className="mt-4">Template Description</h3>
+                  <hr style={{ margin: "15px 0" }} />
+
                   <p>{pageData.template_description}</p>
                   <hr style={{ margin: "15px 0" }} />
                   <div>
-                    <h2>Please note:</h2>
+                    <h6>Please note:</h6>
                     <p>
                       Downloads on mobile devices are not allowed. Because our
                       files are large and need to be unzipped make sure to use a

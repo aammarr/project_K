@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import React, { useState, useEffect } from 'react'
 import {
   CButton,
@@ -21,6 +20,9 @@ import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import axios from 'axios'
 import CloseIcon from '@mui/icons-material/Close'
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
+import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline'
+import { v4 as uuidv4 } from 'uuid'
 
 const AddTemplate = () => {
   const [templateName, setTemplateName] = useState('')
@@ -39,8 +41,127 @@ const AddTemplate = () => {
   const [loading, setLoading] = useState(false)
   const [progress, setProgress] = useState(0) // Progress state
   const [thumbnailProgress, setThumbnailProgress] = useState(0)
+  const [multipleThumbnailProgress, setMultipleThumbnailProgress] = useState(0)
+  const [multipleFiles, setMultipleFiles] = useState([])
+
+  const [files, setFiles] = useState(null)
+  const [fileArray, setFileArray] = useState([])
+
+  const handleAddFile = (event) => {
+    event.preventDefault()
+    if (fileArray.length < 9) {
+      setFileArray([...fileArray, null])
+      setMultipleFiles([...multipleFiles, null])
+    }
+  }
+
+  const handleRemoveFile = (event, index) => {
+    event.preventDefault()
+
+    const newArray = [...fileArray]
+    const removedFile = newArray.splice(index, 1)[0]
+
+    console.log(removedFile, index)
+
+    // Remove the corresponding file URL from multipleFiles array
+    setMultipleFiles((prevFiles) => {
+      const updatedFiles = [...prevFiles]
+      updatedFiles.splice(index, 1)
+      return updatedFiles
+    })
+
+    setFileArray(newArray)
+  }
+
+  const handleFileChange = async (index, event) => {
+    const file = event.target.files[0]
+
+    setFileArray((prevArray) => {
+      const updatedArray = [...prevArray]
+      updatedArray[index] = file
+      return updatedArray
+    })
+
+    // Upload the file
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+
+      const response = await axiosInstance.post('/template/media', formData, {
+        headers: {
+          'Content-Type': file.type,
+        },
+      })
+
+      const publicUrl = response.data.public_url
+
+      // Update the multipleFiles array with the new URL at the specific index
+      setMultipleFiles((prevFiles) => {
+        const updatedFiles = [...prevFiles]
+        updatedFiles[index] = publicUrl
+        return updatedFiles
+      })
+
+      // Update the fileArray with the new file
+    } catch (error) {
+      console.error('Error uploading file:', error.message)
+      // Handle error as needed
+    }
+  }
+
+  const hasNullValues = multipleFiles.some((file) => file === null)
 
   const navigate = useNavigate()
+
+  const handleMultipleThumbnails = async (event) => {
+    console.log('triggered')
+
+    if (event.target.files?.length > 9) {
+      toast.error('You can only select up to 9 images!')
+      return
+    }
+
+    try {
+      setMultipleThumbnailProgress(1)
+      setFiles(event.target.files)
+      const files = event.target.files
+
+      console.log(files.length)
+
+      if (files) {
+        for (let i = 0; i < files?.length; i++) {
+          const formData = new FormData()
+          formData.append('file', files[i])
+
+          console.log(formData.get('file'))
+
+          const response = await axiosInstance.post('/template/media', formData, {
+            headers: {
+              'Content-Type': files[i]?.type, // Fix: Use files[i]?.type
+            },
+          })
+
+          // Assuming the response contains a public_url field
+          const publicUrl = response.data.public_url
+
+          // Fix: Correct the order of operations
+          setMultipleThumbnailProgress((prevProgress) =>
+            Math.floor(((i + 1) / files?.length) * 100),
+          )
+
+          multipleFiles.push(publicUrl)
+        }
+      }
+    } catch (error) {
+      console.error('Error uploading thumbnail:', error.message)
+      // Handle error as needed
+    }
+  }
+
+  console.log(fileArray)
+  console.log(multipleFiles)
+
+  // console.log(JSON.stringify(multipleFiles))
 
   // Assuming you have setThumbnail and templateThumbnail using useState
 
@@ -274,6 +395,30 @@ const AddTemplate = () => {
         toast.error('Please wait for the file to upload.', { position: toast.POSITION.TOP_RIGHT })
         return
       }
+      // if (multipleFiles?.length !== 0 && multipleThumbnailProgress !== 100) {
+      //   toast.error('Please wait for the thumbnails to upload.', {
+      //     position: toast.POSITION.TOP_RIGHT,
+      //   })
+      //   return
+      // }
+
+      const hasNullValues = fileArray.some((file) => file === null)
+
+      if (hasNullValues) {
+        toast.error('Please add all the images.', {
+          position: toast.POSITION.TOP_RIGHT,
+        })
+        return
+      }
+
+      const hasNotUploaded = multipleFiles.some((file) => file === null)
+
+      if (hasNotUploaded) {
+        toast.error('Please wait for the images to upload', {
+          position: toast.POSITION.TOP_RIGHT,
+        })
+        return
+      }
 
       setLoading(true)
       const requestBody = {
@@ -284,6 +429,11 @@ const AddTemplate = () => {
         template_key: templateKey,
         template_size: templateSize,
         template_type: templateType,
+        template_multiple_thumbnails: '',
+      }
+
+      if (multipleFiles?.length !== 0) {
+        requestBody.template_multiple_thumbnails = JSON.stringify(multipleFiles)
       }
 
       // Include template_url only if it's not an empty string
@@ -358,7 +508,7 @@ const AddTemplate = () => {
                 ))}
               </CFormSelect>
 
-              <CFormLabel htmlFor="thumbnail">Thumbnail</CFormLabel>
+              <CFormLabel htmlFor="thumbnail">Cover Thumbnail</CFormLabel>
               {/* Thumbnail Input Section */}
               {!thumbnailUrl && (
                 <>
@@ -404,6 +554,26 @@ const AddTemplate = () => {
                   />
                 </div>
               )}
+              {/* <CFormLabel htmlFor="file">Choose more thumbnails (Upto 9)</CFormLabel>
+              <CFormInput
+                type="file"
+                id="multiplethumbnails"
+                accept="image/*"
+                onChange={handleMultipleThumbnails}
+                multiple
+              />
+              {multipleThumbnailProgress > 0 && multipleThumbnailProgress < 100 && (
+                <>
+                  <LinearProgress
+                    variant="determinate"
+                    value={multipleThumbnailProgress}
+                    style={{ marginTop: '10px' }}
+                  />
+                  <div
+                    style={{ textAlign: 'center', marginTop: '5px' }}
+                  >{`${multipleThumbnailProgress}% Uploaded`}</div>
+                </>
+              )} */}
 
               <CFormLabel htmlFor="file">Upload File</CFormLabel>
               <CFormInput type="file" id="file" onChange={handleFileUpload} />
@@ -421,7 +591,28 @@ const AddTemplate = () => {
                   >{`${progress}% Uploaded`}</div>
                 </>
               )}
+              <CFormLabel htmlFor="file">Add More Thumbnails</CFormLabel>
 
+              <div>
+                {fileArray.map((file, index) => {
+                  console.log(file)
+                  return (
+                    <div key={index} style={{ display: 'flex', marginBottom: '10px' }}>
+                      <CFormInput
+                        type="file"
+                        onChange={(event) => handleFileChange(index, event)}
+                      />
+                      <RemoveCircleOutlineIcon
+                        onClick={(event) => handleRemoveFile(event, index)}
+                        style={{ marginLeft: '10px', cursor: 'pointer', marginTop: '5px' }}
+                      />
+                    </div>
+                  )
+                })}
+                {fileArray.length < 9 && (
+                  <AddCircleOutlineIcon onClick={handleAddFile} style={{ cursor: 'pointer' }} />
+                )}
+              </div>
               <CButton color="primary" onClick={handleAddTemplate} style={{ marginTop: '20px' }}>
                 {loading ? (
                   <>
