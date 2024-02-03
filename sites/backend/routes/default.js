@@ -4,7 +4,7 @@ const router = Router.Router();
 router.get("/", (req, res) => {
     res.send({
         message: 'Welcome to Slidebloom.',
-        version: '2024.01.31'
+        version: '2024.02.03'
     });
 });
 

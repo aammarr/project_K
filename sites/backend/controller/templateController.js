@@ -14,7 +14,7 @@ AWS.config.update({
 });
 export default {
     
-    // 
+    // Function createTemplate
     createTemplate: async (req, res) => {
         try {
 
@@ -50,7 +50,7 @@ export default {
         }
     },
 
-    // Get all templates
+    // Function Get all templates
     getAllTemplates: async (req, res) => {
         try {
             const { category_id = '', page = 1, limit = 10, search = '' } = req.query;
@@ -99,7 +99,7 @@ export default {
         }
     },
 
-    // Get all templates
+    // Function Get all templates
     getAllTemplatesByCategoryId: async (req, res) => {
         try {
             const { page = 1, limit = 10, search = '' } = req.query;
@@ -141,7 +141,7 @@ export default {
 
     },
 
-    // Get template by ID
+    // Function Get template by ID
     getTemplateById: async (req, res) => {
         const templateId = req.params.id;
         try {
@@ -161,7 +161,7 @@ export default {
         }
     },
 
-    // Update template by ID
+    // Function Update template by ID
     updateTemplateById: async (req, res) => {
         const templateId  = req.params.id;
         const updateData = req.body;
@@ -172,8 +172,28 @@ export default {
                 return res.status(404).send({ status: false, data:foundTemplate, message: 'Template not found' });
             }
             else{
+                let parsedArray=[];
+                let multipleThumbnails = updateData.template_multiple_thumbnails;
+                parsedArray = JSON.parse(multipleThumbnails);
+                delete updateData.template_multiple_thumbnails;
+
                 await template.updateTemplateById(templateId, updateData);
                 const updatedTemplate = await template.getTemplateById(templateId);
+
+                let pictures = await picture.getPicturesByTemplateId(templateId);
+
+                if(pictures.length != 0){
+                    await picture.deletePicturesByTemplateId(templateId);
+                }
+                for (let i = 0; i < parsedArray.length; i++) {
+                    let obj = {
+                        template_id:templateId,
+                        picture_url:parsedArray[i]
+                    };
+                    await picture.createPicture(obj);
+                }
+                updatedTemplate.template_multiple_thumbnails = pictures;
+
                 return res.status(200).send({ status: true, data:updatedTemplate ,message: 'Template updated successfully' });
             }
         } catch (error) {
@@ -181,7 +201,7 @@ export default {
         }
     },
 
-    // Delete template by ID
+    // Function Delete template by ID
     deleteTemplateById: async (req, res) => {
         const templateId = req.params.id;
         try {
@@ -198,7 +218,7 @@ export default {
         }
     },
 
-    // function getUploadId
+    // Function getUploadId
     getUploadId: async (req,res) => {
         try {
             const prefix = 'project_k_templates/'+moment().format('YYYYMMDD_HHmmss') + "_";
@@ -262,7 +282,7 @@ export default {
         }
     },
 
-    // function listMultipartUpload
+    // Function listMultipartUpload
     listMultipartUpload:async (req,res,next)=>{
         try{ 
             const params = {
@@ -277,7 +297,7 @@ export default {
         }
     },
 
-    // function completeMultipartUpload
+    // Function completeMultipartUpload
     completeMultipartUpload:async (req,res,next)=>{
         try{
             const s3Params = {
@@ -298,7 +318,7 @@ export default {
         }
     },
 
-    // fileSaveIntoDb
+    // Function fileSaveIntoDb
     fileSaveIntoDb:async(req,res,next)=>{
         try {
             const fileInfo = {
@@ -322,7 +342,7 @@ export default {
         }
     },
 
-    // 
+    // Function getPutSignedUrl
     getPutSignedUrl: async(req,res,next) =>{
         try{
             const bucketName = process.env.AWS_BUCKET;
@@ -342,7 +362,7 @@ export default {
         }
     },
 
-    //
+    // Function getDownloadUrl
     getDownloadUrl: async(req,res,next)=>{
         try{
             const bucketName = process.env.AWS_BUCKET;
@@ -363,7 +383,7 @@ export default {
         }
     },
 
-    //
+    // Function testgetAllFunciton
     testgetAllFunciton:async(req,res,next)=>{
         try{
             const {page = 1, limit = 10, category_id = null} = req.query;
