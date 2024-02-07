@@ -110,7 +110,7 @@ const Collections = () => {
     <div className="container-fluid">
       <div className="row">
         {/* Left Container (1/4th size) */}
-        <div className="col-lg-2 mt-5 pt-1">
+        <div className="col-lg-2 pt-1">
           <CategoriesList
             categories={categories}
             onCategoryClick={handleCategoryClick}

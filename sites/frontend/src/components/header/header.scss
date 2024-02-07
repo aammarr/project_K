@@ -1,6 +1,7 @@
-// src/components/Header.scss
-
 .header {
+  position: sticky;
+  z-index: 3;
+  top: 0;
   background-color: #e8ccf8;
   padding: 10px 20px; // Padding for the header
   display: flex; // Use flexbox for layout

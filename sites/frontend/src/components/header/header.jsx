@@ -34,8 +34,6 @@ const Header = () => {
     setAnchorEl(null);
   };
 
-  console.log(user);
-
   return (
     <div className="header">
       <Link to="/" className="logo">

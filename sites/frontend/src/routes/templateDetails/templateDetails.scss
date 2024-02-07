@@ -1,0 +1,69 @@
+/* Slideshow Gallery Container */
+.slideshow-gallery {
+  position: relative;
+}
+
+/* Slideshow Image */
+.slideshow-image img {
+  width: 100%;
+  height: 430px;
+}
+
+/* Navigation Buttons */
+.navigation-buttons {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+}
+
+.navigation-buttons button {
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.navigation-buttons button:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+/* Position the "previous button" to the left */
+.prev {
+  border-radius: 0 5px 5px 0;
+}
+
+/* Position the "next button" to the right */
+.next {
+  border-radius: 5px 0 0 5px;
+}
+
+/* Thumbnails Container */
+.thumbnails {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+/* Thumbnail Images */
+.thumbnails img {
+  width: 60px; /* Adjust thumbnail size as needed */
+  height: auto;
+  margin: 0 5px;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+}
+
+.thumbnails img.active {
+  opacity: 1;
+}
+
+.thumbnails img:hover {
+  opacity: 1;
+}

@@ -10,6 +10,10 @@ import { Modal, Box, Typography, Button, IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import Slider from "react-slick";
 import ImageGallery from "react-image-gallery";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import Rating from "@mui/material/Rating";
+import { TextField } from "@mui/material";
 
 const TemplateDetails = () => {
   const location = useLocation();
@@ -21,6 +25,28 @@ const TemplateDetails = () => {
   const [showLoginModal, setShowLoginModal] = useState(false); // State for modal visibility
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false); // State for modal visibility
   const [imagesArray, setImagesArray] = useState([]);
+  const [reviews, setReviews] = useState([]);
+
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isWritingReview, setIsWritingReview] = useState(false);
+
+  const handleWriteReviewClick = () => {
+    setIsWritingReview(!isWritingReview);
+  };
+
+  const goToPreviousSlide = () => {
+    const newIndex =
+      (currentImageIndex - 1 + imagesArray.length) % imagesArray.length;
+    setCurrentImageIndex(newIndex);
+  };
+
+  const goToNextSlide = () => {
+    const newIndex = (currentImageIndex + 1) % imagesArray.length;
+    setCurrentImageIndex(newIndex);
+  };
+  const goToSlide = (index) => {
+    setCurrentImageIndex(index);
+  };
 
   useEffect(() => {
     // Update the imagesArray when pageData changes
@@ -53,9 +79,7 @@ const TemplateDetails = () => {
     // Call the function when the component mounts and whenever pageData changes
     if (pageData) updateImagesArray();
   }, [pageData]);
-
   const user = useSelector((state) => state.user.user);
-  console.log(user);
 
   const fetchData = async () => {
     try {
@@ -100,15 +124,6 @@ const TemplateDetails = () => {
     window.open(responseOne?.data?.data, "_blank");
   };
 
-  const settings = {
-    dots: true,
-    dotsClass: "slick-dots slick-thumb",
-    infinite: true,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-  };
-
   return (
     <>
       {loading ? (
@@ -118,11 +133,11 @@ const TemplateDetails = () => {
         </div>
       ) : (
         pageData && (
-          <div className="container-fluid p-5">
+          <div className="container-lg p-5">
             <div className="row">
               {/* Left Container (3/4 size) */}
-              <div className="col-md-7">
-                {imagesArray?.length !== 0 ? (
+              <div className="col-md-8">
+                {/* {imagesArray?.length !== 0 ? (
                   <ImageGallery items={imagesArray} />
                 ) : (
                   <img
@@ -131,7 +146,43 @@ const TemplateDetails = () => {
                     className="img-fluid rounded"
                     style={{ height: "500px", width: "100%" }}
                   />
-                )}
+                )} */}
+                <div className="container">
+                  {/* Full-width images with number text */}
+                  {imagesArray?.length !== 0 && (
+                    <div className="slideshow-gallery">
+                      <div className="slideshow-image">
+                        <img
+                          src={imagesArray[currentImageIndex].thumbnail}
+                          alt={`Slide ${currentImageIndex + 1}`}
+                        />
+                      </div>
+                      <div className="navigation-buttons">
+                        <button className="prev" onClick={goToPreviousSlide}>
+                          <ArrowBackIcon />
+                        </button>
+                        <button className="next" onClick={goToNextSlide}>
+                          <ArrowForwardIcon />
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                  {imagesArray && (
+                    <div className="thumbnails">
+                      {imagesArray.map((image, index) => (
+                        <img
+                          key={index}
+                          src={image.thumbnail}
+                          alt={`Thumbnail ${index + 1}`}
+                          className={
+                            index === currentImageIndex ? "active" : ""
+                          }
+                          onClick={() => goToSlide(index)}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </div>
                 {/* <img
                   src={pageData.template_thumbnail || "images/no-image.jpg"} // Replace with the actual image source
                   alt="Template Image"
@@ -175,13 +226,101 @@ const TemplateDetails = () => {
                       once payment is confirmed.
                     </p>
                   </div>
+                  <hr style={{ margin: "15px 0" }} />
+                  <Box
+                    border={1}
+                    borderColor="primary.main"
+                    p={2}
+                    position="relative"
+                  >
+                    <Typography variant="h5" gutterBottom>
+                      Customer Reviews
+                    </Typography>
+                    {reviews.length === 0 ? (
+                      <Typography variant="body1">No reviews</Typography>
+                    ) : (
+                      <Typography variant="body1">
+                        {reviews.length} Reviews
+                      </Typography>
+                    )}
+                    {isWritingReview && (
+                      <Box
+                        border={1}
+                        borderColor="grey.400"
+                        p={2}
+                        mb={2}
+                        mt={1}
+                      >
+                        <form className="mb-3">
+                          <TextField label="Name" fullWidth margin="normal" />
+                          <TextField label="Email" fullWidth margin="normal" />
+                          <Rating
+                            name="rating"
+                            defaultValue={0}
+                            precision={0.5}
+                          />
+                          <TextField label="Title" fullWidth margin="normal" />
+
+                          <TextField
+                            label="Review"
+                            fullWidth
+                            multiline
+                            rows={4}
+                            margin="normal"
+                          />
+                          <Button variant="contained" color="primary">
+                            Submit
+                          </Button>
+                        </form>
+                      </Box>
+                    )}
+                    {/* {reviews.map((review, index) => (
+                      <Review key={index} review={review} />
+                    ))} */}
+                    <Box border={1} borderColor="grey.400" p={2} mb={2} mt={1}>
+                      <Typography variant="h6" gutterBottom>
+                        Review Title
+                      </Typography>
+                      <Typography variant="subtitle1" gutterBottom>
+                        <Rating />{" "}
+                      </Typography>
+                      <Typography variant="subtitle1" gutterBottom>
+                        Name on DD-MM-YYYY
+                      </Typography>
+                      <Typography variant="body1">
+                        Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                        Nemo, nesciunt animi. Corrupti, qui nostrum. A maxime
+                        illo dolores sequi exercitationem, quod id reiciendis
+                        saepe unde omnis debitis quidem cum necessitatibus.
+                      </Typography>
+                    </Box>
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      onClick={handleWriteReviewClick}
+                      style={{
+                        position: "absolute",
+                        top: "10px",
+                        right: "10px",
+                      }}
+                    >
+                      {isWritingReview ? "Cancel" : "Write a Review"}
+                    </Button>
+                  </Box>
                 </div>
               </div>
 
-              <div className="col-md-1"></div>
-
               {/* Right Container (1/4 size) */}
               <div className="col-md-4">
+                <div style={{ display: "flex" }}>
+                  <Rating
+                    name="read-only"
+                    value={4}
+                    readOnly
+                    style={{ marginBottom: "40px", marginRight: "10px" }}
+                  />{" "}
+                  <span> (5 Reviews)</span>{" "}
+                </div>
                 {/* Ad Placeholder */}
                 <div
                   className="ad-placeholder"
@@ -189,13 +328,13 @@ const TemplateDetails = () => {
                     backgroundColor: "#E8CCF8",
                   }}
                 >
-                  <div style={{ width: "400px", height: "500px" }}>
+                  <div style={{ width: "400px", height: "400px" }}>
                     Ad Placeholder
                   </div>
                 </div>
                 <div className="row mt-4">
                   <button
-                    className="btn btn-primary p-2"
+                    className="btn btn-primary p-2 mt-4"
                     onClick={() =>
                       handleDownloadTemplate(pageData?.template_key)
                     }
