@@ -115,8 +115,6 @@ const AddTemplate = () => {
   const navigate = useNavigate()
 
   const handleMultipleThumbnails = async (event) => {
-    console.log('triggered')
-
     if (event.target.files?.length > 9) {
       toast.error('You can only select up to 9 images!')
       return
@@ -127,14 +125,10 @@ const AddTemplate = () => {
       setFiles(event.target.files)
       const files = event.target.files
 
-      console.log(files.length)
-
       if (files) {
         for (let i = 0; i < files?.length; i++) {
           const formData = new FormData()
           formData.append('file', files[i])
-
-          console.log(formData.get('file'))
 
           const response = await axiosInstance.post('/template/media', formData, {
             headers: {
@@ -159,10 +153,6 @@ const AddTemplate = () => {
     }
   }
 
-  console.log(fileArray)
-  console.log(multipleFiles)
-  console.log(finalFiles)
-
   // console.log(JSON.stringify(multipleFiles))
 
   // Assuming you have setThumbnail and templateThumbnail using useState
@@ -177,12 +167,9 @@ const AddTemplate = () => {
       setThumbnailProgress(20)
       setThumbnail(event.target.files[0])
       const file = event.target.files[0]
-      console.log(file)
       if (file) {
         const formData = new FormData()
         formData.append('file', file)
-
-        console.log(formData.get('file'))
 
         const response = await axiosInstance.post('/template/media', formData, {
           headers: {
@@ -193,9 +180,6 @@ const AddTemplate = () => {
         // Assuming the response contains a public_url field
         const publicUrl = response.data.public_url
         setThumbnailProgress(80)
-
-        console.log(response)
-        console.log(publicUrl)
 
         // Set the templateThumbnail state
         setThumbnailUrl(publicUrl)
@@ -228,8 +212,6 @@ const AddTemplate = () => {
       setFile(event.target.files[0])
       const newFile = event.target.files[0]
 
-      console.log(newFile)
-
       // file size is smaller than 5 Mb
       if (newFile?.size < 4999999) {
         setProgress(20)
@@ -251,7 +233,6 @@ const AddTemplate = () => {
         // const key = responseOne?.data?.data?.key + '.' + fileExtension
         const key = responseOne?.data?.data?.key
         const url = responseOne?.data?.data?.url
-        console.log('responseOne : ', responseOne.data)
 
         setTemplateKey(key)
         setTemplateType(newFile?.type)
@@ -318,21 +299,19 @@ const AddTemplate = () => {
             ETag: uploadResponse.headers.etag.replace(/"/g, ''),
           })
           const sortedParts = uploadedEtags.sort((a, b) => a.PartNumber - b.PartNumber)
-          console.log(sortedParts)
-          console.log(progress)
+
           if (uploadedChunks === totalChunks) {
             let completeUploadpPostData = {
               key: responseOneData?.Key,
               uploadId: responseOneData?.UploadId,
               ETagsArray: sortedParts,
             }
-            console.log(completeUploadpPostData)
+
             let completeUploadResponse = await axiosInstance.post(
               'template/complete-multipart-upload',
               completeUploadpPostData,
             )
 
-            console.log(completeUploadResponse)
             if (completeUploadResponse?.status === 200) {
               const body = {
                 content_type: newFile?.type,
@@ -365,24 +344,7 @@ const AddTemplate = () => {
     }
   }
 
-  console.log(fileArray.some((file) => file?.file === null))
-
-  console.log(finalFiles.some((file) => file === undefined))
-
   const handleAddTemplate = async () => {
-    console.log(progress)
-    console.log('Adding template:', {
-      templateName,
-      templateDescription,
-      templateCode,
-      categoryId,
-      templateKey,
-      templateSize,
-      templateUrl,
-      templateType,
-      thumbnailUrl,
-    })
-
     try {
       if (!templateName || !templateDescription || !templateCode || !categoryId) {
         toast.error('Please fill in all fields', { position: toast.POSITION.TOP_RIGHT })
