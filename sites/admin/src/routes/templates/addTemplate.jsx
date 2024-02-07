@@ -605,6 +605,7 @@ const AddTemplate = () => {
                     <CFormInput
                       type="file"
                       onChange={(event) => handleFileChange(file?.id, index, event)}
+                      accept="image/*"
                     />
                     <RemoveCircleOutlineIcon
                       onClick={(event) => handleRemoveFile(event, file?.id)}

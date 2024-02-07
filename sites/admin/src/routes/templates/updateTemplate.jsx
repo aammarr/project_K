@@ -22,6 +22,9 @@ import axiosInstance from 'src/axios/axiosConfig'
 import axios from 'axios'
 import { LinearProgress } from '@mui/material' // Import LinearProgress
 import CloseIcon from '@mui/icons-material/Close'
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
+import RemoveCircleOutlineIcon from '@mui/icons-material/RemoveCircleOutline'
+import { v4 as uuidv4 } from 'uuid'
 
 const UpdateTemplate = () => {
   const location = useLocation()
@@ -39,6 +42,7 @@ const UpdateTemplate = () => {
   const [templateType, setTemplateType] = useState('')
   const [thumbnailUrl, setThumbnailUrl] = useState('')
   const [thumbnail, setThumbnail] = useState(null)
+  const [templateMultipleThumbnails, setTemplateMultipleThumbnails] = useState([])
 
   const [progress, setProgress] = useState(0) // Progress state
   const [thumbnailProgress, setThumbnailProgress] = useState(0)
@@ -49,6 +53,108 @@ const UpdateTemplate = () => {
   const [loading, setLoading] = useState(false)
   const [editable, setEditable] = useState(false) // New state for edit mode
   const [editIconVisible, setEditIconVisible] = useState(true)
+  const [multipleFiles, setMultipleFiles] = useState([])
+  const [finalFiles, setFinalFiles] = useState([])
+
+  const [fileArray, setFileArray] = useState([])
+
+  useEffect(() => {
+    const urlArray = multipleFiles.map((item) => item.url)
+
+    setFinalFiles(urlArray)
+  }, [multipleFiles])
+
+  useEffect(() => {
+    // Initialize fileArray with existing thumbnails
+    setFileArray(
+      templateMultipleThumbnails.map((thumbnail) => ({
+        url: thumbnail?.picture_url,
+        id: thumbnail.picture_id,
+        file: null,
+      })),
+    )
+    setMultipleFiles(
+      templateMultipleThumbnails.map((thumbnail) => ({
+        url: thumbnail?.picture_url,
+        id: thumbnail?.picture_id,
+        file: null,
+      })),
+    )
+    setFinalFiles(templateMultipleThumbnails.map((thumbnail) => thumbnail?.picture_url))
+  }, [templateMultipleThumbnails])
+
+  const handleAddFile = (event) => {
+    event.preventDefault()
+
+    if (fileArray.length < 9) {
+      const fileId = uuidv4() // Generate a unique ID using uuid
+      setFileArray([...fileArray, { id: fileId, file: null }])
+      setFinalFiles([...finalFiles, ''])
+
+      setMultipleFiles([...multipleFiles, { id: fileId, file: null }])
+    }
+  }
+
+  const handleRemoveFile = (event, id) => {
+    event.preventDefault()
+
+    // Remove the corresponding file entry from multipleFiles array
+    setMultipleFiles((prevFiles) => prevFiles.filter((file) => file.id !== id))
+
+    // Remove the corresponding file entry from fileArray
+    setFileArray((prevArray) => prevArray.filter((file) => file.id !== id))
+  }
+
+  const handleFileChange = async (id, index, event) => {
+    const file = event.target.files[0]
+
+    setFileArray((prevArray) => {
+      const updatedArray = [...prevArray]
+      updatedArray[index] = { id, file }
+      return updatedArray
+    })
+
+    // Upload the file
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+
+      const response = await axiosInstance.post('/template/media', formData, {
+        headers: {
+          'Content-Type': file.type,
+        },
+      })
+
+      const publicUrl = response.data.public_url
+
+      // Update the multipleFiles array with the new URL at the specific index
+      setMultipleFiles((prevFiles) => {
+        const updatedFiles = [...prevFiles]
+        updatedFiles[index] = { id, url: publicUrl } // Include id with the URL in the array
+        return updatedFiles
+      })
+
+      // Replace the empty string with the new URL in the finalFiles array
+      setFinalFiles((prevFiles) => {
+        const updatedFiles = [...prevFiles]
+        updatedFiles[index] = publicUrl
+        return updatedFiles
+      })
+
+      // You might want to handle other state updates or logic here
+    } catch (error) {
+      console.error('Error uploading file:', error.message)
+      toast.error(`${error.message}`)
+
+      // Handle error as needed
+    }
+  }
+
+  const hasNullValues = multipleFiles.some((file) => file === null)
+
+  console.log(fileArray)
+  console.log(multipleFiles)
+  console.log(finalFiles)
 
   const [isUploading, setIsUploading] = useState(false)
   const handleRemoveThumbnail = () => {
@@ -266,6 +372,7 @@ const UpdateTemplate = () => {
       setTemplateDownloadCount(templateData.template_download_count)
       setTemplateViewCount(templateData.template_view_count)
       setThumbnailUrl(templateData.template_thumbnail) // Set the thumbnail URL
+      setTemplateMultipleThumbnails(templateData?.template_multiple_thumbnails)
     } catch (error) {
       console.error('Error fetching template data:', error)
       toast.error('Error fetching template data')
@@ -275,6 +382,10 @@ const UpdateTemplate = () => {
   useEffect(() => {
     fetchData()
   }, [id])
+
+  const handleUpdate = () => {
+    console.log(finalFiles)
+  }
 
   const handleUpdateTemplate = async () => {
     console.log('Updating template:', {
@@ -297,12 +408,34 @@ const UpdateTemplate = () => {
         toast.error('Please select a thumbnail.', { position: toast.POSITION.TOP_RIGHT })
         return
       }
+
+      const hasNullValues = fileArray.some((file) => !file?.url && file?.file === null)
+
+      console.log(hasNullValues)
+
+      if (hasNullValues) {
+        toast.error('Please add all the images.', {
+          position: toast.POSITION.TOP_RIGHT,
+        })
+        return
+      }
+
+      const hasNotUploaded = finalFiles.some((file) => file === undefined)
+
+      if (hasNotUploaded) {
+        toast.error('Please wait for the images to upload', {
+          position: toast.POSITION.TOP_RIGHT,
+        })
+        return
+      }
+
       const requestBody = {
         template_name: templateName,
         template_description: templateDescription,
         template_code: templateCode,
         category_id: categoryId,
         template_thumbnail: thumbnailUrl,
+        template_multiple_thumbnails: '',
       }
 
       // Update template data using the provided template ID
@@ -312,6 +445,10 @@ const UpdateTemplate = () => {
         requestBody.template_size = templateSize
         requestBody.template_type = templateType
         requestBody.template_url = templateUrl
+      }
+
+      if (finalFiles?.length !== 0) {
+        requestBody.template_multiple_thumbnails = JSON.stringify(finalFiles)
       }
 
       await axiosInstance.put(`admin/template/${id}`, requestBody)
@@ -510,6 +647,39 @@ const UpdateTemplate = () => {
                       <GetAppIcon style={{ marginRight: '5px' }} />
                       Download Template
                     </CButton>
+                  </div>
+                </>
+              )}
+
+              {editable && (
+                <>
+                  {' '}
+                  <CFormLabel htmlFor="file">Add More Thumbnails</CFormLabel>
+                  <div>
+                    {fileArray.map((file, index) => (
+                      <div key={file?.id} style={{ display: 'flex', marginBottom: '10px' }}>
+                        {file?.url ? (
+                          <img
+                            src={file?.url}
+                            alt="thumbnail"
+                            style={{ width: '100px', marginRight: '65.7%' }}
+                          />
+                        ) : (
+                          <CFormInput
+                            type="file"
+                            onChange={(event) => handleFileChange(file?.id, index, event)}
+                            accept="image/*"
+                          />
+                        )}
+                        <RemoveCircleOutlineIcon
+                          onClick={(event) => handleRemoveFile(event, file?.id)}
+                          style={{ marginLeft: '10px', cursor: 'pointer', marginTop: '5px' }}
+                        />
+                      </div>
+                    ))}
+                    {fileArray.length < 9 && (
+                      <AddCircleOutlineIcon onClick={handleAddFile} style={{ cursor: 'pointer' }} />
+                    )}
                   </div>
                 </>
               )}
