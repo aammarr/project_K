@@ -425,6 +425,29 @@ export default {
             return res.status(500).send({ status: false, message: 'Internal server error.', error });
         }
     },
+    
+    // Function Add Template Review By Appointment Id
+    getTemplateReviewByAppointmentId: async(req,res,next)=>{
+        try{
+            const templateId = req?.params.id;
+            if(!templateId){
+                return res.status(401).send({ status: false, message: 'Template Id is required' });
+            }
+            
+            // 
+            const foundTemplate = await template.getTemplateById(templateId);
+            if (!foundTemplate) {
+                return res.status(404).send({ status: false, data:foundTemplate, message: 'Template not found' });
+            }
+
+            let reviews = await Modelreview.getAllReviewsByTemplateId(templateId);
+
+            return res.status(200).send({ status: true, data:reviews, message: 'Template review fetched successfully.' });
+        }
+        catch (error) {
+            return res.status(500).send({ status: false, message: 'Internal server error.', error });
+        }
+    },
 
     // Function testgetAllFunciton
     testgetAllFunciton:async(req,res,next)=>{
