@@ -22,6 +22,7 @@ const {
   completeMultipartUpload,
   getPutSignedUrl,
   getDownloadUrl,
+  addTemplateReviewByAppointmentId
 } = templateController;
 
 router.get("/getPutSignedUrl", getPutSignedUrl);
@@ -39,6 +40,8 @@ router.post("/", auth, createTemplate);
 router.get("/:id", getTemplateById);
 router.put("/:id", auth, updateTemplateById);
 router.delete("/:id", auth, deleteTemplateById);
+
+router.post("/review/:id", auth, addTemplateReviewByAppointmentId);
 
 // upload
 

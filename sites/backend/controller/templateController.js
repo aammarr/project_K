@@ -1,5 +1,6 @@
 import template from "../models/template.js";
 import picture from "../models/picture.js";
+import Modelreview from "../models/review.js";
 import AWS from 'aws-sdk';
 import moment from 'moment';
 import awsService from '../services/aws.js';
@@ -383,6 +384,48 @@ export default {
         }
     },
 
+    // Function Add Template Review By Appointment Id
+    addTemplateReviewByAppointmentId: async(req,res,next)=>{
+        try{
+            const userId = req?.user.userId;
+            const templateId = req?.params.id;
+            const title = req?.body.title;
+            const review = req?.body.review;
+            const rating = req?.body.rating;
+            
+            if(!templateId || !review || !review || !rating){
+              return res.status(401).send({ status: false, message: 'Template Id, Title, Review  & Rating is required' });
+            }
+            
+            // 
+            const foundTemplate = await template.getTemplateById(templateId);
+            if (!foundTemplate) {
+                return res.status(404).send({ status: false, data:foundTemplate, message: 'Template not found' });
+            }
+            else{
+                let obj = {
+                    user_id:userId,
+                    template_id:templateId,
+                    title:title,
+                    review:review,
+                    rating:rating
+                };
+                await Modelreview.createReview(obj);
+                let newAverageRating = await Modelreview.calculateAverageRating(templateId);
+                let updateData = {
+                    review_count:foundTemplate.review_count+=1,
+                    rating:newAverageRating[0].average_rating,
+                };
+                await template.updateTemplateById(templateId, updateData);
+            }
+            
+            return res.status(200).send({ status: true, message: 'Template review created successfully.' });
+        }
+        catch (error) {
+            return res.status(500).send({ status: false, message: 'Internal server error.', error });
+        }
+    },
+
     // Function testgetAllFunciton
     testgetAllFunciton:async(req,res,next)=>{
         try{
@@ -422,4 +465,6 @@ export default {
         }
         
     }
+
+
 }
