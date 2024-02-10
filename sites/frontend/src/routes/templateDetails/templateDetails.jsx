@@ -26,12 +26,54 @@ const TemplateDetails = () => {
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false); // State for modal visibility
   const [imagesArray, setImagesArray] = useState([]);
   const [reviews, setReviews] = useState([]);
+  const [title, setTitle] = useState("");
+  const [review, setReview] = useState("");
+  const [ratingValue, setRatingValue] = useState(null);
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isWritingReview, setIsWritingReview] = useState(false);
+  function formatDate(dateString) {
+    const date = new Date(dateString);
+
+    // Extracting date components
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // Month is zero-based
+    const year = date.getFullYear();
+
+    // Extracting time components
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const seconds = String(date.getSeconds()).padStart(2, "0");
+
+    // Combining date and time components in the desired format
+    const formattedDate = `${day}-${month}-${year}, ${hours}:${minutes}:${seconds}`;
+
+    return formattedDate;
+  }
+  const handleReviewClick = async () => {
+    try {
+      if (!title || !review || !ratingValue) {
+        toast.error("Please fill all the fields!");
+        return;
+      }
+
+      const body = { title: title, review: review, rating: ratingValue };
+      const response = await axiosInstance.post(`template/review/${id}`, body);
+      if (response) {
+        toast.success("Review posted successfully!");
+        fetchData();
+        fetchReviews();
+        setIsWritingReview(false);
+      }
+    } catch (error) {
+      console.error("Error writing review", error);
+      toast.error("Error posting review.");
+    }
+  };
 
   const handleWriteReviewClick = () => {
-    setIsWritingReview(!isWritingReview);
+    if (user) setIsWritingReview(!isWritingReview);
+    else setShowLoginModal(true);
   };
 
   const goToPreviousSlide = () => {
@@ -97,10 +139,31 @@ const TemplateDetails = () => {
     }
   };
 
+  const fetchReviews = async () => {
+    try {
+      // Fetch template data using the provided template ID
+      const response = await axiosInstance.get(`template/review/${id}`);
+      const reviewsData = response?.data?.data;
+
+      // Set the form fields with the retrieved data
+      setReviews(reviewsData);
+    } catch (error) {
+      console.error("Error fetching reviews data:", error);
+      toast.error("Error fetching Reviews data");
+    } finally {
+      setLoading(false); // Set loading to false after data is fetched
+    }
+  };
+  const userReviewExists = reviews.some(
+    (review) => review.user_id === user?.user_id
+  );
   useEffect(() => {
     if (!id) {
       window.location = "../";
-    } else fetchData();
+    } else {
+      fetchData();
+      fetchReviews();
+    }
   }, [id]);
 
   function convertDateFormat(inputDate) {
@@ -251,15 +314,20 @@ const TemplateDetails = () => {
                         mb={2}
                         mt={1}
                       >
-                        <form className="mb-3">
-                          <TextField label="Name" fullWidth margin="normal" />
-                          <TextField label="Email" fullWidth margin="normal" />
+                        <div className="mb-3">
                           <Rating
                             name="rating"
                             defaultValue={0}
-                            precision={0.5}
+                            onChange={(event, newValue) => {
+                              setRatingValue(newValue);
+                            }}
                           />
-                          <TextField label="Title" fullWidth margin="normal" />
+                          <TextField
+                            label="Title"
+                            fullWidth
+                            margin="normal"
+                            onChange={(e) => setTitle(e.target.value)}
+                          />
 
                           <TextField
                             label="Review"
@@ -267,33 +335,46 @@ const TemplateDetails = () => {
                             multiline
                             rows={4}
                             margin="normal"
+                            onChange={(e) => setReview(e.target.value)}
                           />
-                          <Button variant="contained" color="primary">
+                          <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={handleReviewClick}
+                          >
                             Submit
                           </Button>
-                        </form>
+                        </div>
                       </Box>
                     )}
-                    {/* {reviews.map((review, index) => (
-                      <Review key={index} review={review} />
-                    ))} */}
-                    <Box border={1} borderColor="grey.400" p={2} mb={2} mt={1}>
-                      <Typography variant="h6" gutterBottom>
-                        Review Title
-                      </Typography>
-                      <Typography variant="subtitle1" gutterBottom>
-                        <Rating />{" "}
-                      </Typography>
-                      <Typography variant="subtitle1" gutterBottom>
-                        Name on DD-MM-YYYY
-                      </Typography>
-                      <Typography variant="body1">
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                        Nemo, nesciunt animi. Corrupti, qui nostrum. A maxime
-                        illo dolores sequi exercitationem, quod id reiciendis
-                        saepe unde omnis debitis quidem cum necessitatibus.
-                      </Typography>
-                    </Box>
+                    {reviews.map((review) => (
+                      <Box
+                        border={1}
+                        borderColor="grey.400"
+                        p={2}
+                        mb={2}
+                        mt={1}
+                        key={review?.id}
+                      >
+                        <Typography variant="h6" gutterBottom>
+                          {review?.title}
+                        </Typography>
+                        <Typography variant="subtitle1" gutterBottom>
+                          <Rating readOnly value={review?.rating} />{" "}
+                        </Typography>
+                        <Typography variant="subtitle1" gutterBottom>
+                          {`${
+                            review?.user_id === user?.user_id
+                              ? "You"
+                              : `${review?.first_name} ${review?.last_name}`
+                          } on ${formatDate(review?.created_at)}`}
+                        </Typography>
+                        <Typography variant="body1">
+                          {review?.review}
+                        </Typography>
+                      </Box>
+                    ))}
+
                     <Button
                       variant="outlined"
                       color="primary"
@@ -302,6 +383,7 @@ const TemplateDetails = () => {
                         position: "absolute",
                         top: "10px",
                         right: "10px",
+                        display: userReviewExists ? "none" : "block", // Show the button only if user's review doesn't exist
                       }}
                     >
                       {isWritingReview ? "Cancel" : "Write a Review"}
@@ -315,11 +397,16 @@ const TemplateDetails = () => {
                 <div style={{ display: "flex" }}>
                   <Rating
                     name="read-only"
-                    value={4}
+                    value={pageData?.rating}
                     readOnly
                     style={{ marginBottom: "40px", marginRight: "10px" }}
+                    precision={0.5}
                   />{" "}
-                  <span> (5 Reviews)</span>{" "}
+                  {pageData?.review_count ? (
+                    <span> ({pageData?.review_count} Reviews)</span>
+                  ) : (
+                    <span>No Reviews</span>
+                  )}
                 </div>
                 {/* Ad Placeholder */}
                 <div
@@ -360,6 +447,8 @@ const TemplateDetails = () => {
             transform: "translate(-50%, -50%)",
             width: 300,
             bgcolor: "background.paper",
+            borderRadius: 8, // Rounded corners
+            border: "2px solid #ccc", // Border
             boxShadow: 24,
             p: 2,
             textAlign: "center",
@@ -375,9 +464,9 @@ const TemplateDetails = () => {
           <Typography
             variant="h6"
             gutterBottom
-            style={{ padding: "70px 10px" }}
+            style={{ padding: "20px 10px" }} // Adjusted padding
           >
-            Please login or Signup to view this template!
+            Please login or sign up first!
           </Typography>
           <Button
             variant="contained"
@@ -404,6 +493,8 @@ const TemplateDetails = () => {
             transform: "translate(-50%, -50%)",
             width: 300,
             bgcolor: "background.paper",
+            borderRadius: 8, // Rounded corners
+            border: "2px solid #ccc", // Border
             boxShadow: 24,
             p: 2,
             textAlign: "center",
@@ -419,9 +510,9 @@ const TemplateDetails = () => {
           <Typography
             variant="h6"
             gutterBottom
-            style={{ padding: "70px 10px" }}
+            style={{ padding: "20px 10px" }} // Adjusted padding
           >
-            Please purchase subscription to download this template!
+            Please purchase a subscription to download this template!
           </Typography>
           <Button
             variant="contained"
