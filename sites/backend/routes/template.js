@@ -42,7 +42,7 @@ router.get("/:id", getTemplateById);
 router.put("/:id", auth, updateTemplateById);
 router.delete("/:id", auth, deleteTemplateById);
 
-router.get("/review/:id", auth, getTemplateReviewByAppointmentId);
+router.get("/review/:id", getTemplateReviewByAppointmentId);
 router.post("/review/:id", auth, addTemplateReviewByAppointmentId);
 
 // upload
