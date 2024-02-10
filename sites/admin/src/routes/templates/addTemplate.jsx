@@ -397,7 +397,7 @@ const AddTemplate = () => {
         template_key: templateKey,
         template_size: templateSize,
         template_type: templateType,
-        template_multiple_thumbnails: '',
+        template_multiple_thumbnails: '[]',
       }
 
       if (finalFiles?.length !== 0) {

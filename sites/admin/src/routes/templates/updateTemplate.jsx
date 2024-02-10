@@ -402,7 +402,7 @@ const UpdateTemplate = () => {
         template_code: templateCode,
         category_id: categoryId,
         template_thumbnail: thumbnailUrl,
-        template_multiple_thumbnails: '',
+        template_multiple_thumbnails: '[]',
       }
 
       // Update template data using the provided template ID

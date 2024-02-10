@@ -356,18 +356,24 @@ const TemplateDetails = () => {
                         mt={1}
                         key={review?.id}
                       >
+                        <div style={{ display: "flex" }}>
+                          <Rating
+                            readOnly
+                            value={review?.rating}
+                            style={{ marginRight: "10px" }}
+                          />{" "}
+                          {`${
+                            review?.user_id === user?.user_id
+                              ? "You    "
+                              : `${review?.first_name} ${review?.last_name}    `
+                          }`}
+                        </div>
                         <Typography variant="h6" gutterBottom>
                           {review?.title}
                         </Typography>
                         <Typography variant="subtitle1" gutterBottom>
-                          <Rating readOnly value={review?.rating} />{" "}
-                        </Typography>
-                        <Typography variant="subtitle1" gutterBottom>
-                          {`${
-                            review?.user_id === user?.user_id
-                              ? "You"
-                              : `${review?.first_name} ${review?.last_name}`
-                          } on ${formatDate(review?.created_at)}`}
+                          {" "}
+                          {formatDate(review?.created_at)}
                         </Typography>
                         <Typography variant="body1">
                           {review?.review}
@@ -375,19 +381,21 @@ const TemplateDetails = () => {
                       </Box>
                     ))}
 
-                    <Button
-                      variant="outlined"
-                      color="primary"
-                      onClick={handleWriteReviewClick}
-                      style={{
-                        position: "absolute",
-                        top: "10px",
-                        right: "10px",
-                        display: userReviewExists ? "none" : "block", // Show the button only if user's review doesn't exist
-                      }}
-                    >
-                      {isWritingReview ? "Cancel" : "Write a Review"}
-                    </Button>
+                    {user && (
+                      <Button
+                        variant="outlined"
+                        color="primary"
+                        onClick={handleWriteReviewClick}
+                        style={{
+                          position: "absolute",
+                          top: "10px",
+                          right: "10px",
+                          display: userReviewExists ? "none" : "block",
+                        }}
+                      >
+                        {isWritingReview ? "Cancel" : "Write a Review"}
+                      </Button>
+                    )}
                   </Box>
                 </div>
               </div>
